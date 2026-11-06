@@ -1,0 +1,27 @@
+# Piyush Rajput
+
+> Computer Science and Engineering student at Karnavati University, specializing in AI/ML. Exploring AI, interactive software, browser-based 3D, robotics, and embedded systems.
+
+From curiosity to creation. This portfolio distinguishes built work, prototypes, proposed architecture, and learning.
+
+## Pages
+
+- [Portfolio](/): The Builder's Mind, a nine-chapter editorial portfolio with an optional original Signal Run game.
+- [About](/about.md): Biography, education, interests, and public profiles.
+- [Projects](/projects.md): Accurate project records and development status.
+- [Skills](/skills.md): Project experience distinguished from learning and exploration.
+- [Full public portfolio](/llms-full.txt): Detailed text representation.
+
+## Project resources
+
+- [Tridix](/projects/tridix/): Built. Physics, beyond the flat page. A browser-based learning experience that brings concepts into three dimensions.
+- [LegalOne](/projects/legalone/): Hackathon project. A conversational starting point for Indian legal information, explored with team Binary Bandits.
+- [Meghdoot AI](/projects/meghdoot-ai/): SIH team project. A flood-detection project explored across an app, web application, and website for Smart India Hackathon.
+- [BRTS Bus Route System](/projects/brts/): Terminal prototype. From command line to interface: working with bus-route information using Python and MySQL.
+- [Smart Calendar](/projects/smart-calendar/): Exploring. A physical student calendar concept: dates, tasks, reminders, and a little more connection to everyday life.
+- [Autonomous Driving Robot](/projects/autonomous-robot/): Architecture exploration. Exploring the bridge from perception to movement, through a proposed two-board autonomous robot architecture.
+
+## Public profiles
+
+- [GitHub](https://github.com/pepieglitched)
+- [LinkedIn](https://www.linkedin.com/in/piyush-rajput-414b21410)

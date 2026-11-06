@@ -1,0 +1,7 @@
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { projects } from '@/content/portfolio';
+import ProjectArtwork from '@/components/ProjectArtwork';
+import styles from './projects.module.scss';
+export const metadata:Metadata={title:'Project archive',description:'Built projects, prototypes, and explorations by Piyush Rajput across AI, software, education, and embedded systems.',alternates:{canonical:'/projects/'}};
+export default function ProjectArchive(){return <main id="main" className={styles.archive}><p className="eyebrow">THE WORK / THE PROCESS / THE QUESTIONS</p><h1 data-hero-line>Ideas in<br/><span className="serif">the making.</span></h1><p className={styles.archiveIntro}>Six projects, with room for the process and the unfinished parts. Each record distinguishes what was built from what is still being explored.</p><div className={styles.archiveGrid}>{projects.map(p=><article key={p.slug} data-reveal><Link href={`/projects/${p.slug}/`} aria-label={`Read ${p.title}`}><ProjectArtwork kind={p.slug} compact/></Link><div className={styles.archiveMeta}><span>{p.number} / {p.category}</span><span>{p.status}</span></div><h2><Link href={`/projects/${p.slug}/`}>{p.title} <span aria-hidden="true">↗</span></Link></h2><p>{p.summary}</p></article>)}</div><Link href="/#human" className="text-link">Back to the story <span aria-hidden="true">↖</span></Link></main>;}

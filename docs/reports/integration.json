@@ -1,0 +1,36 @@
+{
+  "base": "http://localhost:3000",
+  "timestamp": "2026-11-06T13:54:15.171Z",
+  "checks": [
+    "Server-rendered editorial home and portrait load",
+    "Desktop has no horizontal overflow",
+    "Mind tabs support keyboard selection",
+    "Laboratory tabs support arrow navigation",
+    "Accessible game completes all three cores",
+    "Arcade keyboard movement and Escape pause",
+    "Game skip preserves native anchor navigation",
+    "All six crawlable case-study pages and JSON-LD parse",
+    "SEO, social preview, and AI resources return HTTP 200",
+    "390px mobile layout has no horizontal overflow",
+    "Mobile navigation opens and follows work anchor",
+    "Reduced motion keeps content visible and skips WebGL",
+    "360px, 768px, 1024px, and 1920px layouts avoid overflow",
+    "Primary content and projects readable without JavaScript",
+    "No browser runtime errors during integration"
+  ],
+  "accessibility": [
+    {
+      "page": "home-desktop",
+      "violations": []
+    },
+    {
+      "page": "game-paused",
+      "violations": []
+    },
+    {
+      "page": "mobile",
+      "violations": []
+    }
+  ],
+  "errors": []
+}

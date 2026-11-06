@@ -1,0 +1,27 @@
+@use '../styles/tokens' as *;
+.art { position:relative; width:100%; aspect-ratio:1.4; background:#e4e2d9; overflow:hidden; transition:background .4s; }
+.topline,.bottomline { @include mono; position:absolute; left:1.5rem; right:1.5rem; display:flex; justify-content:space-between; z-index:2; font-size:.5rem; }
+.topline {top:1.5rem;} .bottomline {bottom:1.5rem;}
+.physics { position:absolute;inset:0;display:grid;place-items:center; }
+.orbit { position:absolute; border:1px solid rgba($ink,.5); border-radius:50%; width:58%; height:28%; transform:rotate(-25deg); &:nth-child(2) {transform:rotate(40deg);} &:nth-child(3) {transform:rotate(90deg);} }
+.planet { width:29%; aspect-ratio:1; border-radius:50%; background:radial-gradient(circle at 30% 28%,#dfdbd1 0%,#88877f 38%,#151617 72%); box-shadow:15px 18px 32px rgba($ink,.14); z-index:1; background-image:radial-gradient(circle at 30% 28%,transparent,#0b0c0f 75%),repeating-radial-gradient(circle at 30% 20%,#d3d1c5 0px,#d3d1c5 2px,#77776f 3px,#77776f 4px); }
+.satellite { position:absolute;width:16px;height:16px;border-radius:50%;background:$red;left:25%;top:46%;box-shadow:0 0 0 6px rgba($red,.1); }
+.equation { @include mono;position:absolute;right:10%;top:22%;font-style:italic; }
+.axis {position:absolute;top:12%;left:48%;@include mono;} .axisX {position:absolute;right:8%;top:53%;@include mono;}
+.physicsTitle { position:absolute; left:7%; bottom:12%; font-size:clamp(1.8rem,3vw,3.6rem); letter-spacing:-.065em; line-height:.95; z-index:2; em {font-family:var(--font-serif);font-weight:400;} }
+.legalone {background:#262725;color:$paper;}
+.legal { position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:4%; >div {width:63%;padding-top:2rem; >span {display:block;font-size:clamp(1.8rem,3.2vw,3.5rem);line-height:1.05;letter-spacing:-.06em;margin:1.4rem 0;em{font-family:var(--font-serif);font-weight:400;}} small{@include mono;font-size:.45rem;color:#b5b4ad;} } }
+.legalMark {font-family:var(--font-serif);font-size:13rem;line-height:1;color:$red;}
+.chat {display:flex;gap:.6rem;padding:.8rem 1rem;border:1px solid #73746c;font-size:.65rem;align-items:center;i{width:5px;height:5px;background:$red;} b{margin-left:auto;} }
+.meghdootai { background:#cdd3cf; }
+.flood {position:absolute;inset:0;svg{width:100%;height:100%;} >span{position:absolute;left:9%;top:25%;font-size:clamp(2rem,4vw,4.5rem);letter-spacing:-.07em;line-height:.95;em{font-family:var(--font-serif);font-weight:400;}} small{position:absolute;left:9%;bottom:18%;@include mono;font-size:.5rem;} }
+.brts {background:#e8ddca;}
+.route {position:absolute;inset:0;display:flex;align-items:center;justify-content:space-evenly; >span{@include mono;border:1px solid $ink;background:#e8ddca;z-index:1;border-radius:50%;padding:1.1rem;} >i{width:9px;height:9px;border-radius:50%;background:$red;z-index:1;} >div:last-child{position:absolute;left:8%;top:20%;small{@include mono;font-size:.5rem;} strong{display:block;font-size:clamp(1.8rem,3.5vw,4rem);letter-spacing:-.07em;line-height:1;margin-top:1rem;em{font-family:var(--font-serif);font-weight:400;}}} }
+.routeLine {position:absolute;top:68%;width:76%;height:1px;background:$ink;}
+.route>span,.route>i{margin-top:25%;}
+.calendar {position:absolute;inset:17% 10%;>div{border:1px solid $ink;padding:1rem;background:$paper;transform:rotate(-4deg);box-shadow:7px 7px 0 rgba($ink,.13);>span{@include mono;font-size:.5rem;} strong{display:flex;align-items:center;gap:1rem;font-size:4rem;letter-spacing:-.08em;line-height:1;margin:1rem 0;span{font-size:1rem;letter-spacing:-.03em;font-weight:400;}}} small{@include mono;display:block;font-size:.45rem;position:absolute;right:-6%;bottom:-12%;} }
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;i{height:5px;background:#d9d7ce;}}
+.robot{position:absolute;inset:7%;display:flex;flex-direction:column;align-items:center;justify-content:center;svg{max-height:85%;} >span{@include mono;font-size:.6rem;}}
+.autonomousrobot {background:#d1d6e0;}
+.compact { .topline,.bottomline{font-size:.42rem;left:1rem;right:1rem;}.topline{top:1rem;}.bottomline{bottom:1rem;}.legalMark{font-size:9rem;}.physicsTitle{font-size:2rem;} }
+@include mobile { .art{aspect-ratio:1.2;} .topline,.bottomline{left:1rem;right:1rem;font-size:.43rem;}.legalMark{font-size:9rem;}.legal>div>span{font-size:2rem;}.physicsTitle{font-size:2rem;}.equation{font-size:.55rem;}.chat{font-size:.5rem;padding:.5rem;}.calendar>div strong{font-size:3rem;} }

@@ -1,0 +1,70 @@
+import { chromium } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
+import { mkdir, writeFile } from 'node:fs/promises';
+import assert from 'node:assert/strict';
+
+const base = process.env.TEST_URL || 'http://localhost:3000';
+await mkdir('test-results', {recursive:true});
+const browser = await chromium.launch({channel:'chrome',headless:true});
+const report = {base, timestamp:new Date().toISOString(),checks:[],accessibility:[],errors:[]};
+const check = (name) => {report.checks.push(name);console.log(`PASS ${name}`);};
+try {
+  const desktopContext = await browser.newContext({viewport:{width:1440,height:1000},deviceScaleFactor:1});
+  const page = await desktopContext.newPage();
+  page.on('pageerror',error=>report.errors.push(error.message));
+  await page.goto(base,{waitUntil:'networkidle'});
+  await page.locator('h1').waitFor();
+  await page.screenshot({path:'test-results/desktop-hero.png'});
+  assert.match(await page.locator('h1').innerText(), /I BUILD/); check('Server-rendered editorial home and portrait load');
+  assert.equal(await page.locator('img[fetchpriority="high"]').evaluate(img=>img.complete && img.naturalWidth>0),true);
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true); check('Desktop has no horizontal overflow');
+  const a11y = await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
+  report.accessibility.push({page:'home-desktop',violations:a11y.violations.map(({id,impact,nodes})=>({id,impact,nodes:nodes.map(n=>({html:n.html,summary:n.failureSummary}))}))});
+  await page.getByRole('tab',{name:/01 Intelligence/}).focus();
+  await page.keyboard.press('End');
+  assert.equal(await page.getByRole('tab',{name:/03 Physical systems/}).getAttribute('aria-selected'),'true'); check('Mind tabs support keyboard selection');
+  await page.locator('#mind').screenshot({path:'test-results/mind.png'});
+  await page.getByRole('tab',{name:/Smart Calendar/}).focus(); await page.keyboard.press('ArrowDown');
+  assert.equal(await page.getByRole('tab',{name:/Autonomous Driving Robot/}).getAttribute('aria-selected'),'true'); check('Laboratory tabs support arrow navigation');
+  await page.locator('#work').screenshot({path:'test-results/work.png'});
+  await page.locator('#signal-run').scrollIntoViewIfNeeded();
+  await page.getByRole('combobox',{name:'PLAY STYLE'}).waitFor();
+  await page.getByRole('combobox',{name:'PLAY STYLE'}).selectOption('turns');
+  await page.getByRole('button',{name:'PRESS START →',exact:true}).click();
+  for(let i=0;i<3;i++) {await page.getByRole('button',{name:'JUMP FORWARD ↑',exact:true}).click();await page.getByRole('button',{name:'MOVE FORWARD →',exact:true}).click();}
+  await page.getByRole('heading',{name:/MISSION COMPLETE/}).waitFor();
+  assert.match(await page.getByRole('status').innerText(),/Curious Mind/);check('Accessible game completes all three cores');
+  await page.locator('#signal-run').screenshot({path:'test-results/game.png'});
+  await page.getByRole('combobox',{name:'PLAY STYLE'}).selectOption('arcade');
+  await page.getByRole('button',{name:'PRESS START →',exact:true}).click();
+  const stage=page.getByRole('application',{name:'Signal Run play area'});await stage.focus();
+  await page.keyboard.down('ArrowRight');await page.waitForTimeout(600);await page.keyboard.up('ArrowRight');await page.keyboard.press('Escape');
+  await page.getByRole('heading',{name:'PAUSED.'}).waitFor();check('Arcade keyboard movement and Escape pause');
+  const gameA11y=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
+  report.accessibility.push({page:'game-paused',violations:gameA11y.violations.map(({id,impact,nodes})=>({id,impact,nodes:nodes.map(n=>({html:n.html,summary:n.failureSummary}))}))});
+  await page.getByRole('link',{name:'SKIP ↗',exact:true}).click();await page.waitForTimeout(500);
+  assert.equal(new URL(page.url()).hash,'#laboratory');check('Game skip preserves native anchor navigation');
+  for(const slug of ['tridix','legalone','meghdoot-ai','brts','smart-calendar','autonomous-robot']){
+    const response=await page.goto(`${base}/projects/${slug}/`,{waitUntil:'networkidle'});assert.equal(response.status(),200);assert.equal(await page.locator('h1').count(),1);
+    const schema=await page.locator('script[type="application/ld+json"]').allTextContents();schema.forEach(x=>JSON.parse(x));
+  } check('All six crawlable case-study pages and JSON-LD parse');
+  await page.screenshot({path:'test-results/project.png'});
+  for(const endpoint of ['/projects/','/sitemap.xml','/robots.txt','/llms.txt','/llms-full.txt','/about.md','/projects.md','/skills.md','/og.png']){const response=await page.request.get(base+endpoint);assert.equal(response.status(),200,endpoint);}check('SEO, social preview, and AI resources return HTTP 200');
+  const mobileContext=await browser.newContext({viewport:{width:390,height:844},deviceScaleFactor:1,isMobile:true,hasTouch:true});
+  const mobile=await mobileContext.newPage();
+  mobile.on('pageerror',e=>report.errors.push(e.message));await mobile.goto(base,{waitUntil:'networkidle'});
+  assert.equal(await mobile.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);check('390px mobile layout has no horizontal overflow');
+  await mobile.screenshot({path:'test-results/mobile-hero.png'});
+  await mobile.getByRole('button',{name:'Menu +'}).click();await mobile.getByRole('link',{name:/02 Selected work/}).click();
+  await mobile.waitForURL('**/#work');
+  assert.equal(new URL(mobile.url()).hash,'#work');check('Mobile navigation opens and follows work anchor');
+  await mobile.locator('#signal-run').scrollIntoViewIfNeeded();await mobile.getByRole('button',{name:'PRESS START →',exact:true}).waitFor();
+  await mobile.screenshot({path:'test-results/mobile-game.png'});
+  const mobileA11y=await new AxeBuilder({page:mobile}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();report.accessibility.push({page:'mobile',violations:mobileA11y.violations.map(({id,impact,nodes})=>({id,impact,nodes:nodes.map(n=>({html:n.html,summary:n.failureSummary}))}))});
+  await mobile.emulateMedia({reducedMotion:'reduce'});await mobile.goto(base,{waitUntil:'networkidle'});
+  await mobile.locator('#mind').scrollIntoViewIfNeeded();assert.equal(await mobile.locator('#mind canvas').count(),0);assert.equal(await mobile.locator('h1').isVisible(),true);check('Reduced motion keeps content visible and skips WebGL');
+  for(const width of [360,768,1024,1920]){await page.setViewportSize({width,height:900});await page.goto(base,{waitUntil:'networkidle'});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`overflow at ${width}`);}check('360px, 768px, 1024px, and 1920px layouts avoid overflow');
+  const nojs=await browser.newPage({javaScriptEnabled:false});const nojsResponse=await nojs.goto(base);const html=await nojsResponse.text();assert.match(html,/Tridix/);assert.match(html,/Karnavati/);await nojs.goto(`${base}/#work`);await nojs.getByRole('heading',{name:'Tridix',exact:true}).waitFor();assert.match(await nojs.locator('#work').innerText(),/Tridix/);check('Primary content and projects readable without JavaScript');
+  assert.equal(report.errors.length,0,JSON.stringify(report.errors));check('No browser runtime errors during integration');
+} catch(error){report.failure=error.stack;console.error(error);process.exitCode=1;}
+finally {await writeFile('test-results/verification.json',JSON.stringify(report,null,2));await browser.close();}

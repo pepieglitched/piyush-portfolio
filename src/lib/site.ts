@@ -1,0 +1,1 @@
+export const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://piyush-builders-mind.plaidchime4.chatgpt.site';

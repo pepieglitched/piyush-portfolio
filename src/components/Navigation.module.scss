@@ -1,0 +1,14 @@
+@use '../styles/tokens' as *;
+.header { position:sticky; top:0; z-index:40; background:rgba($paper,.96); backdrop-filter:blur(10px); }
+.nav { display:flex; justify-content:space-between; align-items:center; min-height:88px; margin:0 var(--gutter); border-bottom:1px solid $line; position:relative; }
+.identity { display:flex; gap:.8rem; align-items:center; font-size:.84rem; letter-spacing:-.035em; font-weight:700;
+  svg { width:30px; height:30px; color:$red; }
+  small { @include mono; display:block; font-size:.49rem; margin-top:.25rem; font-weight:400; letter-spacing:.1em; }
+}
+.desktop { display:flex; align-items:center; gap:2.5rem; font-size:.76rem; a { transition:color .2s; &:hover {color:$red;} } }
+.contact { display:flex; gap:2.5rem; border-bottom:1px solid $ink; padding:.65rem 0; }
+.toggle { display:none; background:none; border:0; padding:1rem 0 1rem 1rem; font-size:.8rem; }
+.mobile { position:absolute; top:100%; left:calc(-1 * var(--gutter)); right:calc(-1 * var(--gutter)); background:$paper; box-shadow:0 20px 25px rgba($ink,.1); padding:1rem var(--gutter) 2rem;
+ a {display:flex; gap:1.5rem; align-items:center; font-size:1.6rem; padding:1rem 0; border-bottom:1px solid $line; span { @include mono; &:last-child { margin-left:auto; } } }
+}
+@media(max-width:800px) { .nav {min-height:76px;} .desktop {display:none;} .toggle {display:block;} }

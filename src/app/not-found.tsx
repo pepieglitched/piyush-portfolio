@@ -1,0 +1,2 @@
+import Link from 'next/link';
+export default function NotFound(){return <main id="main" style={{padding:'8rem var(--gutter)',minHeight:'75vh'}}><p className="eyebrow">404 / SIGNAL LOST</p><h1 style={{fontSize:'clamp(3rem,8vw,8rem)',letterSpacing:'-.07em',margin:'2rem 0'}}>An unexplored route.</h1><p>Let’s find our way back to the story.</p><Link href="/" className="text-link">Return to the portfolio <span aria-hidden="true">↗</span></Link></main>;}

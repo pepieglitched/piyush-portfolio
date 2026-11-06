@@ -1,0 +1,2 @@
+'use client';
+export default function Error({reset}:{reset:()=>void}){return <main id="main" style={{padding:'6rem var(--gutter)',minHeight:'70vh'}}><p className="eyebrow">SYSTEM INTERRUPTED</p><h1 style={{fontSize:'3rem',letterSpacing:'-.05em',margin:'2rem 0'}}>Let’s try that again.</h1><p>The page couldn’t finish rendering.</p><button onClick={reset} style={{marginTop:'2rem',padding:'1rem 2rem',background:'var(--ink)',color:'var(--paper)',border:0}}>Reload the experience ↗</button></main>;}
