@@ -122,7 +122,10 @@ try {
   assert.equal((await nav.getByRole('link',{name:'Piyush Rajput — home'}).innerText()).trim(),'PIYUSH RAJPUT');
   assert.equal(await nav.locator('svg').count(),0);
   for(const id of ['mind','education','skills','work','signal-run','contact']) assert.equal(await nav.locator(`a[href="/#${id}"]`).filter({visible:true}).count(),1);
-  const glass=await nav.evaluate(element=>({radius:parseFloat(getComputedStyle(element).borderRadius),color:getComputedStyle(element).backgroundColor,backdrop:getComputedStyle(element).backdropFilter}));
+  const glass=await nav.locator('[data-glass-surface]').evaluate(element=>{
+    const style=getComputedStyle(element);
+    return {radius:parseFloat(style.borderRadius),color:style.backgroundColor,backdrop:style.backdropFilter};
+  });
   assert.ok(glass.radius>=16,'The navigation must retain its rounded glass geometry');
   report.observations.navigation=glass;check('Floating navigation has name-only branding and six working chapter links');
 

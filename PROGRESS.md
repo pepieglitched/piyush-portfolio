@@ -54,3 +54,18 @@ The original source archive remains in outputs. The V3 source archive is a separ
 - Lighthouse performance scored 94 on mobile and 100 on desktop. Mobile LCP measured 2.97 seconds. See docs/VERIFICATION.md and docs/reports/v4 for all metrics.
 - Brainwiz and LaserHacks are active. OlympAI and Smart India Hackathon remain inactive pending matching assets.
 - The existing owner-private Site is the V4 release target. For release provenance or later updates, reuse the existing Site ID and query the current live version. Do not run a second scroll engine beside Locomotive.
+
+# Portfolio Iteration V5
+
+- Resumed from the existing V4 checkout and in-progress V5 styles and displacement component. Wired the dedicated glass layer and filter into the existing navbar.
+- The optical layer uses light tint, a softly lit rim, and adaptive blur. Desktop Chromium can sample a curved SVG displacement map. Other browsers and touch sizes use the SCSS bevel and native blur.
+- Existing layout, anchor indicators, sticky header motion, and Locomotive integration remain in place. Reflection updates only on pointer events. The displacement map rebuilds only when the navbar geometry changes.
+- Next: validate the production export, compare the rendered rim over light, dark, and textured backgrounds, and verify mobile navigation, reduced motion, and keyboard focus.
+
+## V5 verified
+
+- The transparent surface, curved edge refraction, pointer reflection, navigation highlights, and raised contact control are implemented. On desktop Chrome and Edge, rendered pixels bent near the rounded rim while the center stayed aligned. The optical layer does not intercept input.
+- Chrome, Edge, and the 390px touch layout passed light, dark, and textured background checks. Sampled foreground contrast met 4.5:1 across the tested labels and surfaces. The mobile menu, anchors, active indicators, scroll direction, keyboard focus, and reduced motion passed.
+- The production build, TypeScript compilation, lint, 29 integration checks, and seven lifecycle checks passed. Four axe scans reported zero violations.
+- Firefox and Safari use the SCSS fallback and were unavailable for direct testing. The CSS fallback was exercised on Chromium without the SVG layer and at touch sizes.
+- V5 is packaged from this checkout for the same owner-private Site. No app changes are pending. Reuse the existing Site ID and check its current live version before the next release.

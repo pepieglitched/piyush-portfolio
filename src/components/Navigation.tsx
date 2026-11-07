@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useMotionActive } from '@/lib/motion-activation';
 import { ANCHOR_TRAVEL_EVENT, NAV_VISIBILITY_EVENT, type NavVisibility } from '@/lib/scroll-events';
+import NavigationRefraction from './NavigationRefraction';
 import styles from './Navigation.module.scss';
 
 const links = [
@@ -169,7 +170,8 @@ export default function Navigation() {
 
   const menuLinks = links.map(([label, id], index) => <a key={id} href={`/#${id}`} aria-current={path === '/' && active === id ? 'location' : undefined} onClick={() => { setActive(id); setOpen(false); }} className={id === 'contact' ? styles.mobileContact : undefined}><span>0{index + 1}</span>{label}<span aria-hidden="true">↗</span></a>);
   return <header ref={header} className={styles.header} data-menu-open={open ? 'true' : undefined}>
-    <nav ref={nav} aria-label="Main navigation" className={styles.nav} onPointerEnter={enterGlass} onPointerMove={moveGlass} onPointerLeave={leaveGlass}>
+    <nav ref={nav} aria-label="Main navigation" className={styles.nav} onPointerEnter={enterGlass} onPointerMove={moveGlass} onPointerLeave={leaveGlass} onPointerCancel={leaveGlass}>
+      <span className={styles.glassSurface} data-glass-surface aria-hidden="true" />
       <Link href="/" className={styles.identity} aria-label="Piyush Rajput — home">PIYUSH RAJPUT</Link>
       <div className={styles.desktop}>{links.map(([label, id]) => <a ref={id === 'contact' ? contact : undefined} key={id} href={`/#${id}`} className={id === 'contact' ? styles.contact : styles.navLink} aria-current={path === '/' && active === id ? 'location' : undefined} onClick={() => setActive(id)} onPointerEnter={id === 'contact' ? event => { contactBounds.current = event.currentTarget.getBoundingClientRect(); } : undefined} onPointerMove={id === 'contact' ? event => {
         const rectangle = contactBounds.current;
@@ -181,6 +183,7 @@ export default function Navigation() {
       <button ref={toggle} className={styles.toggle} type="button" aria-expanded={open} aria-controls="mobile-navigation" onClick={() => { setMenuLoaded(true); setOpen(!open); }}><span>{open ? 'Close' : 'Menu'}</span><span className={styles.menuMark} aria-hidden="true">{open ? '−' : '+'}</span></button>
       {menuLoaded && <Suspense fallback={open ? <div id="mobile-navigation" className={styles.mobile}>{menuLinks}</div> : null}><NavigationMenu open={open}>{menuLinks}</NavigationMenu></Suspense>}
     </nav>
+    <NavigationRefraction nav={nav} />
     {motion && <NavigationMotion header={header} />}
   </header>;
 }

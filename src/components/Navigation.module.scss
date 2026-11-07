@@ -1,5 +1,22 @@
 @use '../styles/tokens' as *;
 
+$glass-ink: #141618;
+$glass-solid: #f4f0e7;
+$glass-frost: blur(5px) saturate(1.23) contrast(.58) brightness(1.1);
+$glass-lens: blur(1.4px) saturate(1.23) contrast(.58) brightness(1.1);
+$glass-spring: cubic-bezier(.18, 1.35, .45, 1);
+
+@mixin raised-glass {
+  border: 1px solid rgba(255, 255, 255, .66);
+  color: $glass-ink;
+  background:
+    radial-gradient(ellipse at 18% 0%, rgba(255, 255, 255, .64), transparent 70%),
+    linear-gradient(150deg, rgba(255, 255, 255, .32), rgba(249, 243, 230, .16));
+  box-shadow: 0 2px 6px rgba(25, 29, 35, .15),
+    inset 0 1px 1px rgba(255, 255, 255, .86),
+    inset 0 -2px 3px rgba(45, 35, 28, .09);
+}
+
 .header {
   position: sticky;
   top: 0;
@@ -24,23 +41,12 @@
   min-height: 68px;
   margin-inline: auto;
   padding: 10px 12px 10px 24px;
-  color: #f5f2eb;
-  border: 1px solid rgba(255, 255, 255, .23);
+  color: $glass-ink;
+  border: 1px solid rgba(96, 84, 69, .19);
   border-radius: 23px;
-  background: rgba(18, 20, 24, .71);
-  box-shadow: 0 8px 24px rgba(11, 12, 15, .12), inset 0 1px 0 rgba(255, 255, 255, .15), inset 0 -1px 0 rgba(11, 12, 15, .15);
-  backdrop-filter: blur(15px) saturate(116%);
-  -webkit-backdrop-filter: blur(15px) saturate(116%);
+  box-shadow: 0 1px 3px rgba(28, 23, 18, .12), 0 12px 32px rgba(25, 21, 17, .14);
   pointer-events: auto;
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    border-radius: inherit;
-    background: linear-gradient(118deg, rgba(255, 255, 255, .085), transparent 31%, rgba(255, 255, 255, .035) 83%);
-    pointer-events: none;
-  }
+  // The specular sheen sits above the optical surface and below the links.
   &::after {
     content: '';
     position: absolute;
@@ -48,11 +54,50 @@
     z-index: 0;
     border-radius: inherit;
     opacity: var(--reflection);
-    background: radial-gradient(ellipse 220px 95px at var(--shine-x) var(--shine-y), rgba(255, 255, 255, .12), transparent 72%);
-    transition: opacity .45s ease;
+    background: radial-gradient(ellipse 180px 64px at var(--shine-x) var(--shine-y),
+      rgba(255, 255, 255, .55), rgba(255, 248, 231, .17) 48%, transparent 78%);
+    transition: opacity .38s ease-out;
     pointer-events: none;
   }
-  a:focus-visible, button:focus-visible { outline: 2px solid $yellow; outline-offset: 4px; }
+  a:focus-visible, button:focus-visible { outline: 2px solid $red-text; outline-offset: 4px; }
+}
+
+.glassSurface {
+  position: absolute;
+  z-index: -1;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: rgba(251, 248, 239, .42);
+  -webkit-backdrop-filter: $glass-frost;
+  backdrop-filter: $glass-frost;
+  // Stacked inner reflections give the bevel depth, even without pixel displacement.
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .83),
+    inset 0 4px 5px -3px rgba(255, 255, 255, .85),
+    inset 0 -2px 4px rgba(59, 43, 30, .12),
+    inset 2px 0 4px -2px rgba(255, 240, 216, .6),
+    inset -2px 0 4px -2px rgba(218, 237, 255, .7);
+}
+
+.nav[data-glass-refraction='true'] .glassSurface {
+  backdrop-filter: var(--glass-refraction) $glass-lens;
+}
+
+@supports (mask-composite: exclude) {
+  .nav::before {
+    content: '';
+    position: absolute;
+    z-index: 0;
+    inset: -1px;
+    padding: 1.5px;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(126deg, #fff 1%, rgba(255, 255, 255, .47) 25%,
+      rgba(123, 103, 84, .13) 52%, rgba(255, 255, 255, .57) 81%, rgba(255, 255, 255, .9) 100%);
+    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask-composite: exclude;
+  }
 }
 .identity {
   position: relative;
@@ -82,9 +127,11 @@
   min-height: 44px;
   padding-inline: .85rem;
   border-radius: 12px;
-  color: #e3e0da;
+  color: $glass-ink;
   white-space: nowrap;
-  transition: color .22s ease, background .3s ease;
+  background: radial-gradient(ellipse at 45% 10%, rgba(255, 255, 255, .68), rgba(255, 255, 255, .21) 65%, transparent) center / 100% 100% no-repeat;
+  background-size: 0 0;
+  transition: background-size .26s $glass-spring, box-shadow .22s ease;
   &::after {
     content: '';
     position: absolute;
@@ -92,13 +139,16 @@
     right: .85rem;
     bottom: 7px;
     height: 1px;
-    background: #eee9df;
+    background: $glass-ink;
     transform: scaleX(0);
     transform-origin: center;
     opacity: .7;
     transition: transform .28s cubic-bezier(.2, .7, .2, 1);
   }
-  &:hover, &:focus-visible, &[aria-current='location'] { color: #fffdf7; background: rgba(255, 255, 255, .045); }
+  &:hover, &:focus-visible, &[aria-current='location'] {
+    background-size: 100% 100%;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .57);
+  }
   &[aria-current='location']::after { transform: scaleX(1); }
 }
 .contact {
@@ -109,17 +159,15 @@
   display: grid;
   align-items: center;
   padding: .7rem 1rem;
-  border: 1px solid rgba(255, 255, 255, .24);
+  @include raised-glass;
   border-radius: 12px;
-  color: #f8f5ee;
-  background: linear-gradient(125deg, rgba(255, 255, 255, .13), rgba(255, 255, 255, .045));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08), 0 2px 6px rgba(0, 0, 0, .1);
-  transition: background .25s ease, border-color .25s ease, box-shadow .25s ease;
+  transition: transform .3s $glass-spring, border-color .25s ease, box-shadow .25s ease;
   &:hover, &[aria-current='location'] {
-    border-color: rgba(255, 255, 255, .5);
-    background: rgba(255, 255, 255, .15);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .15), 0 4px 14px rgba(0, 0, 0, .12);
+    border-color: rgba(255, 255, 255, .96);
+    box-shadow: 0 4px 12px rgba(25, 29, 35, .16), inset 0 1px 2px rgba(255, 255, 255, .95);
   }
+  @media (hover: hover) and (pointer: fine) { &:hover { transform: translateY(-1px); } }
+  &:active { transform: translateY(1px) scale(.985); }
 }
 .contactInner {
   display: flex;
@@ -127,7 +175,7 @@
   justify-content: space-between;
   gap: 1.5rem;
   transform: translate3d(var(--magnet-x), var(--magnet-y), 0);
-  transition: transform .2s cubic-bezier(.2, .7, .2, 1);
+  transition: transform .29s $glass-spring;
   > span { font-size: 1rem; line-height: 1; }
 }
 .toggle {
@@ -139,13 +187,12 @@
   gap: 1rem;
   min-height: 44px;
   padding: .65rem .8rem;
-  border: 1px solid rgba(255, 255, 255, .18);
+  @include raised-glass;
   border-radius: 12px;
-  color: #f5f2eb;
-  background: rgba(255, 255, 255, .06);
   font-size: .73rem;
-  transition: background .2s ease, border-color .2s ease;
-  &:hover, &[aria-expanded='true'] { background: rgba(255, 255, 255, .12); border-color: rgba(255, 255, 255, .35); }
+  transition: border-color .2s ease, transform .24s $glass-spring;
+  &:hover, &[aria-expanded='true'] { border-color: rgba(255, 255, 255, .96); }
+  &:active { transform: scale(.98); }
 }
 .menuMark { font-size: 1rem; line-height: 1; }
 .mobile {
@@ -155,12 +202,12 @@
   top: calc(100% + 10px);
   z-index: 2;
   padding: .75rem 1.2rem 1.2rem;
-  border: 1px solid rgba(255, 255, 255, .18);
+  border: 1px solid rgba(255, 255, 255, .8);
   border-radius: 22px;
-  background: rgba(20, 21, 23, .97);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, .22), inset 0 1px 0 rgba(255, 255, 255, .065);
-  backdrop-filter: blur(24px) saturate(120%);
-  -webkit-backdrop-filter: blur(24px) saturate(120%);
+  background: rgba(249, 246, 236, .88);
+  box-shadow: 0 14px 36px rgba(25, 21, 17, .18), inset 0 1px 0 rgba(255, 255, 255, .79);
+  -webkit-backdrop-filter: $glass-frost;
+  backdrop-filter: $glass-frost;
   transform-origin: top center;
   max-height: calc(100dvh - 132px);
   overflow-y: auto;
@@ -172,26 +219,34 @@
     gap: 1rem;
     min-height: 56px;
     padding: .8rem .15rem;
-    border-bottom: 1px solid rgba(255, 255, 255, .1);
-    color: #eeeae2;
+    border-bottom: 1px solid rgba(25, 21, 17, .14);
+    color: $glass-ink;
     font-size: .98rem;
     letter-spacing: -.025em;
     transition: color .2s ease, background .2s ease;
-    span:first-child { @include mono; font-size: .5rem; color: #b1afa9; }
+    span:first-child { @include mono; font-size: .5rem; color: #53504b; }
     span:last-child { font-size: .9rem; margin-left: auto; }
-    &:hover, &:focus-visible, &[aria-current='location'] { color: #ffffff; }
-    &[aria-current='location'] span:first-child { color: #ff8995; }
+    &:hover, &:focus-visible, &[aria-current='location'] { background: rgba(255, 255, 255, .3); }
+    &[aria-current='location'] span:first-child { color: $red-text; }
   }
   a.mobileContact {
     margin-top: .7rem;
     padding-inline: .8rem;
-    border: 1px solid rgba(255, 255, 255, .24);
+    @include raised-glass;
     border-radius: 12px;
-    background: linear-gradient(125deg, rgba(255, 255, 255, .12), rgba(255, 255, 255, .04));
-    &:hover { background: rgba(255, 255, 255, .15); }
+    &:hover { border-color: #fff; }
   }
 }
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .nav, .mobile { background: #18191c; } }
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glassSurface, .mobile { background: $glass-solid; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .glassSurface, .nav[data-glass-refraction='true'] .glassSurface, .mobile {
+    background: $glass-solid;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
 @media (max-width: 1099px) {
   .header { padding-block: 12px; }
   .nav { min-height: 64px; padding: 8px 9px 8px 20px; border-radius: 21px; }
@@ -211,5 +266,5 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .nav::after { display: none; }
-  .contactInner { transform: none; }
+  .contact, .contactInner, .toggle { transform: none; }
 }

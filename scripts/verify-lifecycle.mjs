@@ -230,11 +230,11 @@ try {
       await page.waitForFunction(() => document.documentElement.dataset.scrollEngine === 'locomotive' && document.querySelector('body > header').dataset.navMotion === 'true');
       await navHidden(false);
       const surface = await page.getByRole('navigation', { name: 'Main navigation' }).evaluate(nav => {
-        const style = getComputedStyle(nav);
+        const style = getComputedStyle(nav.querySelector('[data-glass-surface]'));
         return { color: style.backgroundColor, blur: style.backdropFilter, radius: parseFloat(style.borderRadius) };
       });
       const alpha = Number(surface.color.match(/^rgba\(.+,\s*([\d.]+)\)$/)?.[1]);
-      assert.ok(alpha > .5 && alpha < .82, `Glass must let the backdrop through: ${surface.color}`);
+      assert.ok(alpha > .2 && alpha < .65, `Glass must let the backdrop through: ${surface.color}`);
       assert.match(surface.blur, /blur\(.+\).*saturate\(.+\)/);
       assert.ok(surface.radius >= 16);
 
