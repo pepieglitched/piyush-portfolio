@@ -1,0 +1,57 @@
+@use '../../styles/tokens' as *;
+
+.education {
+  @include section;
+  position: relative;
+  border-top: 1px solid $line;
+  
+}
+.intro {
+  display: grid;
+  grid-template-columns: 1.55fr .65fr;
+  gap: 8%;
+  align-items: end;
+  h2 { margin-top: 2.5rem; font-size: clamp(3.5rem, 6.7vw, 7.3rem); }
+}
+.introduction { max-width: 26rem; padding-bottom: .35rem; color: $graphite; font-size: .88rem; line-height: 1.85; }
+.body { display: grid; grid-template-columns: .7fr 1.3fr; gap: 10%; margin-top: 5.5rem; align-items: start; }
+.marginNote { position: sticky; top: 8.5rem; align-self: start; }
+.marginLabel { @include mono; font-size: .54rem; color: $graphite; }
+.marginNote > p { margin-top: 1.6rem; font-size: clamp(1.6rem, 2.5vw, 2.7rem); letter-spacing: -.055em; line-height: 1.12; em { font-size: 1.15em; } }
+.currentMark { @include mono; display: flex; gap: .6rem; align-items: center; font-size: .52rem; margin-top: 2rem; i { width: 6px; height: 6px; border-radius: 50%; background: $red; } }
+.focus { margin-top: 3rem; border-top: 1px solid $line; padding-top: 1.5rem; > span { @include mono; font-size: .5rem; } ul { list-style: none; padding: 0; margin: 1rem 0 0; } li { font-size: .73rem; line-height: 1.7; color: $graphite; margin: .65rem 0; max-width: 20rem; } }
+.timeline { position: relative; min-width: 0; padding-left: 2.7rem; > ol { list-style: none; padding: 0; margin: 0; } }
+.track { position: absolute; left: 0; top: .35rem; bottom: 1.5rem; width: 1px; background: $line; span { display: block; width: 100%; height: 100%; background: $red; transform-origin: top; } }
+.milestone { position: relative; padding-bottom: 3.5rem; margin-bottom: 3.5rem; border-bottom: 1px solid $line; &:last-child { margin-bottom: 0; padding-bottom: 0; border: 0; } h3 { font-size: clamp(2rem, 3.6vw, 4rem); font-weight: 500; letter-spacing: -.065em; line-height: 1.05; margin: 1.5rem 0 .6rem; } }
+.marker { position: absolute; width: 9px; height: 9px; border: 1px solid $red; background: $paper; left: -3rem; top: .25rem; box-shadow: 0 0 0 7px $paper; }
+.milestone:last-child .marker { background: $red; }
+.meta { display: flex; align-items: start; justify-content: space-between; gap: 1rem; @include mono; font-size: .53rem; line-height: 1.6; span:first-child { color: $red-text; } span:last-child { text-align: right; } }
+.discipline { font-size: 1.15rem; letter-spacing: -.03em; line-height: 1.5; }
+.institution { font-size: 1rem; margin-top: 1.5rem; letter-spacing: -.025em; span { display: block; font-family: var(--font-mono); font-size: .56rem; color: $graphite; letter-spacing: 0; margin-top: .4rem; line-height: 1.6; } }
+.specialization { margin-top: 1.75rem; padding: 1rem 0 1rem 1.1rem; border-left: 2px solid $red; > span { @include mono; font-size: .48rem; color: $graphite; } p { font-size: 1rem; line-height: 1.5; letter-spacing: -.025em; margin-top: .5rem; } }
+.phase { display: flex; gap: 1rem; flex-wrap: wrap; font-size: .78rem; margin-top: 1.5rem; span { font-family: var(--font-mono); font-size: .53rem; color: $graphite; align-self: center; } }
+.summary { font-size: .85rem; line-height: 1.85; color: $graphite; margin-top: 1.5rem; max-width: 38rem; }
+.coursework { margin-top: 2.4rem; > span { @include mono; font-size: .49rem; } ul { list-style: none; padding: 0; margin: .9rem 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: .7rem 1.5rem; } li { font-size: .72rem; color: $graphite; line-height: 1.7; padding-top: .8rem; border-top: 1px solid $line; } }
+.footer { display: flex; justify-content: space-between; align-items: center; gap: 1.5rem; border-top: 1px solid $line; padding-top: 1.3rem; margin-top: 4rem; > span { @include mono; font-size: .5rem; color: $graphite; } a { font-size: .75rem; } }
+@media (max-width: 950px) { .intro { grid-template-columns: 1.4fr .8fr; gap: 5%; } .body { grid-template-columns: .6fr 1.4fr; gap: 7%; } }
+@include mobile {
+  .education { padding: 4rem var(--gutter);  }
+  .intro { grid-template-columns: 1fr; gap: 1.5rem; h2 { margin-top: 1.5rem; font-size: clamp(3rem, 12.5vw, 4.5rem); } }
+  .introduction { font-size: .8rem; max-width: 31rem; }
+  .body { grid-template-columns: 1fr; margin-top: 3rem; gap: 2.5rem; }
+  .marginNote { position: static; display: grid; grid-template-columns: 1fr auto; gap: 1rem; > p { margin: 0; font-size: 1.6rem; grid-column: 1; } }
+  .marginLabel { grid-column: 1 / -1; font-size: .46rem; }
+  .currentMark { grid-column: 2; grid-row: 2; align-self: end; margin: 0 0 .1rem; font-size: .42rem; white-space: nowrap; }
+  .focus { display: none; }
+  .timeline { padding-left: 1.7rem; }
+  .marker { left: -1.98rem; width: 8px; height: 8px; }
+  .milestone { padding-bottom: 2.5rem; margin-bottom: 2.5rem; h3 { font-size: 2.5rem; margin-top: 1.2rem; } }
+  .meta { font-size: .45rem; gap: .5rem; }
+  .discipline { font-size: 1rem; }
+  .institution { font-size: .95rem; }
+  .specialization { margin-top: 1.4rem; }
+  .summary { font-size: .8rem; }
+  .coursework ul { grid-template-columns: 1fr; gap: .5rem; }
+  .coursework li { font-size: .72rem; }
+  .footer { align-items: flex-start; flex-direction: column; gap: .7rem; margin-top: 2.5rem; > span { font-size: .43rem; } }
+}

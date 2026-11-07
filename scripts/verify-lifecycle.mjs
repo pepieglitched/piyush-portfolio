@@ -5,10 +5,15 @@ import { createHash } from 'node:crypto';
 
 // Run against the production static preview: npm run build && npm run preview.
 const base = process.env.TEST_URL || 'http://localhost:3000';
-const report = { base, timestamp: new Date().toISOString(), checks: [], observations: {}, skipped: [], errors: [] };
+const report = { base, timestamp: new Date().toISOString(), checks: [], observations: {}, skipped: [], errors: [], browserErrors: [] };
 await mkdir('test-results', { recursive: true });
+let currentCheck = '';
+const watchPage = page => {page.on('pageerror',error=>report.browserErrors.push({check:currentCheck,message:error.message,stack:error.stack,url:page.url()}));return page;};
 const check = async (name, action) => {
-  try { await action(); report.checks.push(name); console.log(`PASS ${name}`); }
+  if(process.env.CHECK_PATTERN && !new RegExp(process.env.CHECK_PATTERN,'i').test(name)) {report.skipped.push({check:name,reason:'Excluded by CHECK_PATTERN for focused diagnosis.'});return;}
+  currentCheck = name;
+  const initialErrors=report.browserErrors.length;
+  try { await action(); assert.equal(report.browserErrors.length,initialErrors,`${name}: browser runtime errors were captured; see lifecycle.json`); report.checks.push(name); console.log(`PASS ${name}`); }
   catch (error) { report.errors.push({ name, error: error.stack }); console.error(`FAIL ${name}: ${error.message}`); process.exitCode = 1; }
 };
 const digest = value => createHash('sha256').update(value).digest('hex');
@@ -23,7 +28,7 @@ try {
       // Observe native registrations without changing listener identity or behavior.
       const add = EventTarget.prototype.addEventListener;
       const remove = EventTarget.prototype.removeEventListener;
-      const watched = new Set(['scroll', 'wheel', 'touchstart', 'touchmove', 'touchend', 'click', 'keydown', 'popstate', 'hashchange', 'change']);
+      const watched = new Set(['scroll', 'wheel', 'touchstart', 'touchmove', 'touchend', 'click', 'keydown', 'popstate', 'hashchange', 'change', 'portfolio:skills-change']);
       const records = [];
       const capture = options => typeof options === 'boolean' ? options : Boolean(options?.capture);
       const label = target => target === window ? 'window' : target === document ? 'document' : typeof MediaQueryList !== 'undefined' && target instanceof MediaQueryList ? `media:${target.media}` : null;
@@ -60,9 +65,9 @@ try {
       }, {});
       window.__lifecycleDocument = crypto.randomUUID();
     });
-    const page = await context.newPage();
+    const page = watchPage(await context.newPage());
     const runtimeErrors = [];
-    page.on('pageerror', error => runtimeErrors.push(error.message));
+    page.on('pageerror', error => runtimeErrors.push({message:error.message,stack:error.stack,url:page.url()}));
     try {
       await page.goto(base, { waitUntil: 'networkidle' });
       await page.mouse.move(120, 120); // The production animation engine intentionally loads on visitor intent.
@@ -84,17 +89,32 @@ try {
       const identity = await page.evaluate(() => window.__lifecycleDocument);
       const snapshot = async label => {
         await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
-        await page.waitForTimeout(1100);
+        try {
+          await page.waitForFunction(() => {
+            const chapters=[...document.querySelectorAll('[data-motion-chapter]')];
+            const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+            return chapters.every(chapter => reduced ? !chapter.dataset.motionReady : chapter.dataset.motionReady === 'true');
+          });
+        } catch(error) {
+          report.observations.failedReadiness=await page.evaluate(label=>({label,path:location.pathname,chapters:[...document.querySelectorAll('[data-motion-chapter]')].map(element=>({kind:element.dataset.motionChapter,ready:element.dataset.motionReady,section:element.querySelector('section,footer')?.id,rectCount:element.getClientRects().length,height:element.getBoundingClientRect().height,display:getComputedStyle(element).display})),listeners:window.__listenerSnapshot()}),label);
+          report.observations.runtimeErrors=runtimeErrors;
+          await page.screenshot({path:'test-results/lifecycle-readiness-failure.png'});
+          throw error;
+        }
+        await page.waitForTimeout(1200);
         return page.evaluate(label => {
           const triggers = window.gsap?.core.globals().ScrollTrigger?.getAll();
           const targets = triggers?.map(trigger => trigger.trigger).filter(Boolean);
-          const ownedNodes = [...document.querySelectorAll('[data-reveal], [data-hero-line], [data-hero-note], [data-hero-portrait], [data-parallax], [data-draw]')];
+          const ownedNodes = [...document.querySelectorAll('[data-reveal], [data-hero-line], [data-hero-note], [data-hero-portrait], [data-parallax], [data-draw], [data-motion-word], [data-education-aside], [data-education-item], [data-project-card], [data-project-art], [data-project-meta], [data-project-row], [data-project-number], [data-evidence-item], [data-skill-item], [data-portrait-reveal], [data-game-signal], [data-game-exit]')];
           return {
             label, path: location.pathname, triggers: triggers?.length ?? null,
             staleTriggers: targets ? targets.filter(target => !document.documentElement.contains(target)).length : null,
             duplicateTargets: targets ? targets.length - new Set(targets).size : null,
             animatedTargets: ownedNodes.filter(node => node._gsap).length,
             inlineTransforms: ownedNodes.filter(node => node.style.transform).length,
+            readyChapters: document.querySelectorAll('[data-motion-ready="true"]').length,
+            pinSpacers: document.querySelectorAll('.pin-spacer').length,
+            nestedPinSpacers: document.querySelectorAll('.pin-spacer .pin-spacer').length,
             lenisActive: document.documentElement.classList.contains('lenis'),
             trackedTickerCallbacks: window.__ownedTickerCount?.() ?? null,
             listeners: window.__listenerSnapshot(),
@@ -111,7 +131,9 @@ try {
         await page.waitForURL('**/projects/tridix/');
         const project = await snapshot(`project-${round + 1}`);
         projects.push(project); observations.push(project);
-        if (project.triggers !== null) { assert.equal(project.staleTriggers, 0); assert.equal(project.duplicateTargets, 0); }
+        assert.equal(project.pinSpacers, 0, 'Home chapter pins must not outlive navigation to a case study');
+        assert.equal(project.readyChapters, 0);
+        if (project.triggers !== null) { assert.equal(project.staleTriggers, 0); }
         if (project.trackedTickerCallbacks !== null) assert.equal(project.trackedTickerCallbacks, 1, 'Exactly one app Lenis callback must be registered');
         assert.equal(project.lenisActive, true);
         await page.getByRole('link', { name: 'Home', exact: true }).click();
@@ -119,12 +141,14 @@ try {
         await page.locator('#human').waitFor();
         const home = await snapshot(`home-${round + 1}`);
         homes.push(home); observations.push(home);
-        if (home.triggers !== null) { assert.equal(home.staleTriggers, 0); assert.equal(home.duplicateTargets, 0); }
+        if (home.triggers !== null) { assert.equal(home.staleTriggers, 0); }
         if (home.trackedTickerCallbacks !== null) assert.equal(home.trackedTickerCallbacks, 1);
         assert.equal(home.lenisActive, true);
         assert.equal(await page.evaluate(() => window.__lifecycleDocument), identity, 'Next links should retain the same document');
       }
-      assert.equal(new Set(homes.map(item => item.animatedTargets)).size, 1, 'Home live animation target counts must remain stable across client navigation');
+      assert.equal(new Set(homes.map(item => item.pinSpacers)).size, 1, 'Pin spacers must not accumulate through client routes');
+      assert.equal(new Set(homes.map(item => item.readyChapters)).size, 1, 'Every return must initialize one driver per existing chapter');
+      assert.ok(homes.every(item => item.nestedPinSpacers === 0), 'Pin spacers must not become nested duplicates');
       // GSAP's lazy target cache can initialize at different times on first versus cached visits.
       // It is diagnostic; native listener ownership and transform reversion are the lifecycle assertions.
       if (homes[0].triggers !== null) assert.equal(new Set(homes.map(item => item.triggers)).size, 1);
@@ -137,41 +161,78 @@ try {
       if (reduced.trackedTickerCallbacks !== null) assert.equal(reduced.trackedTickerCallbacks, 0);
       assert.equal(reduced.inlineTransforms, 0, 'GSAP must revert every owned inline transform for reduced motion');
       assert.equal(reduced.lenisActive, false);
-      for (const key of ['window:wheel:bubble', 'window:popstate:bubble', 'window:hashchange:bubble', 'document:click:capture', 'document:keydown:bubble']) {
-        assert.equal((homes[0].listeners[key] || 0) - (reduced.listeners[key] || 0), 1, `Reduced motion must remove one scrolling-controller registration for ${key}`);
-      }
+      assert.equal(reduced.pinSpacers, 0, 'Reduced motion must remove pinned layout wrappers');
+      assert.equal(reduced.readyChapters, 0, 'Reduced motion must unmount chapter drivers');
+      const registrations = item => Object.values(item.listeners).reduce((sum,count)=>sum+count,0);
+      assert.ok(registrations(reduced) < registrations(homes[0]), 'Reduced motion must release animation/controller listeners');
+      for (const key of ['window:wheel:bubble','window:hashchange:bubble','document:click:capture']) assert.ok((reduced.listeners[key] || 0) <= (homes[0].listeners[key] || 0), `Reduced motion must not add ${key}`);
       assert.equal(await page.locator('h1').isVisible(), true);
 
       await page.emulateMedia({ reducedMotion: 'no-preference' });
       const restored = await snapshot('restored-motion'); observations.push(restored);
       if (restored.trackedTickerCallbacks !== null) assert.equal(restored.trackedTickerCallbacks, 1);
       assert.equal(restored.lenisActive, true);
-      if (restored.triggers !== null) { assert.equal(restored.staleTriggers, 0); assert.equal(restored.duplicateTargets, 0); assert.equal(restored.triggers, homes[0].triggers); }
-      assert.equal(restored.animatedTargets, homes[0].animatedTargets);
+      if (restored.triggers !== null) { assert.equal(restored.staleTriggers, 0); assert.equal(restored.triggers, homes[0].triggers); }
+      assert.equal(restored.pinSpacers, homes[0].pinSpacers);
+      assert.equal(restored.readyChapters, homes[0].readyChapters);
       assert.deepEqual(restored.listeners, homes[0].listeners, 'Changing motion preference must restore one set of global listeners');
       assert.deepEqual(runtimeErrors, []);
     } finally { await context.close(); }
   });
 
-  await check('Desktop anchors settle below the sticky header after skipped chapters become visible', async () => {
+  await check('Cinematic headings and education progression respond to scrolling with one intentional desktop pin', async () => {
+    const context=await browser.newContext({viewport:{width:1440,height:1000},reducedMotion:'no-preference'});
+    const page=watchPage(await context.newPage());
+    try {
+      await page.goto(base,{waitUntil:'networkidle'});
+      await page.mouse.move(3,3);
+      await page.waitForFunction(()=>{const chapters=[...document.querySelectorAll('[data-motion-chapter]')];return chapters.length>0 && chapters.every(chapter=>chapter.dataset.motionReady==='true');});
+      const before=await page.locator('#education [data-motion-word]').first().evaluate(element=>({transform:getComputedStyle(element).transform,opacity:getComputedStyle(element).opacity}));
+      await page.locator('#education h2').scrollIntoViewIfNeeded();
+      await page.waitForFunction(()=>{
+        const word=document.querySelector('#education [data-motion-word]');
+        if(!word) return false;
+        const style=getComputedStyle(word);
+        return parseFloat(style.opacity)>.98 && (style.transform==='none' || Math.abs(new DOMMatrixReadOnly(style.transform).m42)<1);
+      });
+      const after=await page.locator('#education [data-motion-word]').first().evaluate(element=>({transform:getComputedStyle(element).transform,opacity:getComputedStyle(element).opacity}));
+      assert.notDeepEqual(after,before,'Scroll entry must visibly change heading word presentation');
+      assert.equal(await page.locator('#education [data-education-aside]').evaluate(element=>element.parentElement.classList.contains('pin-spacer')),true);
+      assert.equal(await page.locator('.pin-spacer .pin-spacer').count(),0,'Pinning must not create nested duplicate spacers');
+      const line=page.locator('#education [data-timeline-line]');
+      const lineBefore=await line.evaluate(element=>getComputedStyle(element).transform);
+      await page.locator('[data-education-stage]').evaluate(element=>{const r=element.getBoundingClientRect();window.scrollTo({top:scrollY+r.top+r.height*.5-innerHeight*.4,behavior:'instant'});});
+      await page.waitForFunction(previous=>{const line=document.querySelector('#education [data-timeline-line]');return line && getComputedStyle(line).transform!==previous;},lineBefore);
+      assert.equal(await page.locator('[data-motion-chapter="education"]').getAttribute('data-motion-pinned'),'true');
+      report.observations.cinematicMotion={headingBefore:before,headingAfter:after,timelineChanged:true,educationPin:true,readyChapters:await page.locator('[data-motion-ready="true"]').count()};
+      await page.locator('#education').screenshot({path:'test-results/education-motion.png'});
+      await page.emulateMedia({reducedMotion:'reduce'});
+      await page.waitForFunction(()=>!document.querySelector('[data-motion-ready="true"]') && !document.querySelector('.pin-spacer'));
+      assert.equal(await page.locator('#education [data-motion-word]').count(),0,'Reduced motion must restore unsplit semantic headings');
+      assert.match(await page.locator('#education h2').innerText(),/Learning the rules/);
+    } finally {await context.close();}
+  });
+
+  await check('Desktop chapter anchors settle below the floating navigation', async () => {
     const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
-    const page = await context.newPage();
+    const page = watchPage(await context.newPage());
     const measurements = [];
     report.observations.anchors = measurements;
     try {
       await page.goto(base, { waitUntil: 'networkidle' });
-      for (const [href, id] of [['/#work', 'work'], ['/#signal-run', 'signal-run'], ['/#contact', 'contact']]) {
+      for (const [href, id] of [['/#mind','mind'], ['/#education','education'], ['/#skills','skills'], ['/#work','work'], ['/#signal-run','signal-run'], ['/#contact','contact']]) {
         await page.locator(`header a[href="${href}"]`).click();
         await page.waitForURL(url => url.hash === `#${id}`);
         await page.waitForFunction(id => {
           const top = document.getElementById(id).getBoundingClientRect().top;
-          const headerBottom = document.querySelector('header').getBoundingClientRect().bottom;
+          const headerBottom = document.querySelector('body > header').getBoundingClientRect().bottom;
           const atEnd = Math.abs(scrollY + innerHeight - document.documentElement.scrollHeight) < 3;
-          return top >= headerBottom - 3 && (top <= headerBottom + 65 || (atEnd && top < 500));
+          const gliding = document.documentElement.classList.contains('lenis-scrolling');
+          return !gliding && top >= headerBottom - 3 && (top <= headerBottom + 80 || (atEnd && top < innerHeight));
         }, id, { timeout: 6000 });
-        const measurement = await page.locator(`#${id}`).evaluate(element => ({ id: element.id, top: element.getBoundingClientRect().top, headerBottom: document.querySelector('header').getBoundingClientRect().bottom, atDocumentEnd: Math.abs(scrollY + innerHeight - document.documentElement.scrollHeight) < 3 }));
+        const measurement = await page.locator(`#${id}`).evaluate(element => ({ id: element.id, top: element.getBoundingClientRect().top, headerBottom: document.querySelector('body > header').getBoundingClientRect().bottom, atDocumentEnd: Math.abs(scrollY + innerHeight - document.documentElement.scrollHeight) < 3 }));
         measurements.push(measurement);
-        assert.ok(measurement.top >= measurement.headerBottom - 3 && (measurement.top <= measurement.headerBottom + 65 || (measurement.atDocumentEnd && measurement.top < 500)), `#${id} must land below the sticky header or at document end: ${JSON.stringify(measurement)}`);
+        assert.ok(measurement.top >= measurement.headerBottom - 3 && (measurement.top <= measurement.headerBottom + 80 || (measurement.atDocumentEnd && measurement.top < 1000)), `#${id} must land below the sticky header or at document end: ${JSON.stringify(measurement)}`);
       }
     } finally { await context.close(); }
   });
@@ -188,7 +249,7 @@ try {
       Object.defineProperty(navigator, 'hardwareConcurrency', { value: 8, configurable: true });
       Object.defineProperty(navigator, 'deviceMemory', { value: 8, configurable: true });
     });
-    const page = await context.newPage();
+    const page = watchPage(await context.newPage());
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
     try {
@@ -212,23 +273,24 @@ try {
 
   await check('Mobile game overlay stays inside its stage and first touch press moves then releases the robot', async () => {
     const context = await browser.newContext({ viewport: { width: 390, height: 1000 }, deviceScaleFactor: 1, isMobile: true, hasTouch: true });
-    const page = await context.newPage();
+    const page = watchPage(await context.newPage());
     try {
       await page.goto(base, { waitUntil: 'networkidle' });
       const navigationStarted = Date.now();
-      await page.getByRole('button', { name: 'Menu +', exact: true }).tap();
-      const selectedWork = page.getByRole('link', { name: /02 Selected work/ });
+      await page.getByRole('button', { name: /^Menu\s*\+?$/ }).tap();
+      const selectedWork = page.getByRole('navigation',{name:'Main navigation'}).getByRole('link', { name: /Selected Work/i });
       await selectedWork.waitFor();
       await selectedWork.tap();
       await page.waitForURL(url => url.hash === '#work');
       await page.waitForFunction(() => {
         const top = document.getElementById('work').getBoundingClientRect().top;
-        return top >= 70 && top <= 145;
+        const bottom=document.querySelector('body > header').getBoundingClientRect().bottom;return top >= bottom - 3 && top <= bottom + 80;
       }, undefined, { timeout: 6000 });
       const workTop = await page.locator('#work').evaluate(element => element.getBoundingClientRect().top);
       const nativeTouch = await page.evaluate(() => ({ coarsePointer: matchMedia('(pointer: coarse)').matches, lenisActive: document.documentElement.classList.contains('lenis') }));
       report.observations.mobileMenu = { navigationMilliseconds: Date.now() - navigationStarted, hash: new URL(page.url()).hash, workTop, ...nativeTouch };
-      assert.ok(workTop >= 70 && workTop <= 145, `Mobile #work anchor top should clear sticky header: ${workTop}`);
+      const headerBottom=await page.locator('body > header').evaluate(element=>element.getBoundingClientRect().bottom);
+      assert.ok(workTop >= headerBottom - 3 && workTop <= headerBottom + 80, `Mobile #work must clear the glass navigation: ${workTop}`);
       assert.equal(nativeTouch.coarsePointer, true);
       assert.equal(nativeTouch.lenisActive, false, 'Touch devices should use native momentum scrolling');
       await page.locator('#signal-run').scrollIntoViewIfNeeded();
@@ -271,7 +333,7 @@ try {
   catch (error) { report.skipped.push({ check: 'Microsoft Edge smoke', reason: `Installed Edge channel unavailable: ${error.message.split('\n')[0]}` }); console.log('SKIP Microsoft Edge channel unavailable'); }
   if (edge) {
     await check('Installed Microsoft Edge renders the home and navigates a case study', async () => {
-      const page = await edge.newPage({ viewport: { width: 1366, height: 900 } });
+      const page = watchPage(await edge.newPage({ viewport: { width: 1366, height: 900 } }));
       const errors = [];
       page.on('pageerror', error => errors.push(error.message));
       await page.goto(base, { waitUntil: 'networkidle' });

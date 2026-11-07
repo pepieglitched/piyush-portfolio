@@ -1,0 +1,59 @@
+{
+  "base": "http://localhost:3000",
+  "timestamp": "2026-11-07T04:09:33.184Z",
+  "checks": [
+    "Transparent cutout preserves original portrait RGB and removes the rectangular background",
+    "Server-rendered editorial hero uses the cutout without compact education labels",
+    "Desktop has no horizontal overflow",
+    "Floating navigation has name-only branding and six working chapter links",
+    "Education, Skill Set, and Page 7 match supplied facts and the sunglasses asset",
+    "Pointer code transformation activates on the portrait and returns on leave",
+    "Keyboard portrait toggle creates silhouette-only code and restores the photograph",
+    "Mind tabs support keyboard selection",
+    "Skill categories support arrow, Home, and End navigation",
+    "Accessible game completes all three cores",
+    "Arcade keyboard movement and Escape pause",
+    "Game skip continues to the Skill Set chapter using native navigation",
+    "All six crawlable case-study pages and JSON-LD parse",
+    "SEO and AI resources return HTTP 200 and contain consistent verified education and skills",
+    "390px mobile layout has no horizontal overflow",
+    "Touch portrait control activates and restores code without hijacking scrolling",
+    "Mobile glass navigation supports Escape and lands at Skills before game initialization",
+    "Reduced-motion portrait toggle provides a static code illustration",
+    "Reduced motion keeps content visible and skips WebGL",
+    "360px, 768px, 1024px, and 1920px layouts avoid overflow",
+    "Primary content, education, and complete skills are readable without JavaScript",
+    "No browser runtime errors during integration",
+    "Desktop, paused-game, and mobile WCAG scans have zero automated violations"
+  ],
+  "accessibility": [
+    {
+      "page": "home-desktop",
+      "violations": []
+    },
+    {
+      "page": "game-paused",
+      "violations": []
+    },
+    {
+      "page": "mobile",
+      "violations": []
+    }
+  ],
+  "observations": {
+    "cutout": {
+      "width": 1145,
+      "height": 1374,
+      "foregroundPixels": 860215,
+      "fullyOpaquePixels": 195,
+      "transparentPixels": 692081,
+      "originalRgbRetention": 1
+    },
+    "navigation": {
+      "radius": 23,
+      "color": "rgba(20, 21, 23, 0.9)",
+      "backdrop": "blur(22px) saturate(1.25)"
+    }
+  },
+  "errors": []
+}

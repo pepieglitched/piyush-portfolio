@@ -1,0 +1,15 @@
+// Reserve the complete game chrome and stage before loading its code. This also
+// keeps downstream Skills/Contact anchors fixed when the module arrives.
+.shell {
+  min-height:calc(min(1200px, 100vw - var(--gutter) - var(--gutter)) / 2.4 + 320px);
+}
+.placeholder {
+  min-height:inherit;
+  display:grid;
+  align-content:center;
+  gap:1rem;
+  padding:3rem 1rem;
+  text-align:center;
+  font:.65rem/1.8 var(--font-mono),monospace;
+}
+@media(max-width:700px) {.shell {min-height:820px;}}

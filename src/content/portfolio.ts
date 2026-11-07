@@ -1,4 +1,4 @@
-/** Public portfolio copy, grounded in the supplied master dossier and theme. */
+/** Public portfolio copy. Education and skills follow the November 2026 source document. */
 export const profile = {
   name: "Piyush Rajput",
   headline: "Building at the intersection of AI, software, and robotics.",
@@ -9,6 +9,9 @@ export const profile = {
     institution: "Karnavati University",
     specialization: "Artificial Intelligence and Machine Learning",
     previous: "Higher secondary education in the Science stream",
+    location: "Ahmedabad, Gujarat, India",
+    currentYear: "First year — last confirmed November 2026",
+    status: "Currently pursuing",
   },
   interests: ["Artificial intelligence", "Generative AI", "Software engineering", "Browser-based 3D", "Robotics", "Embedded systems", "Practical technology", "Football", "Basketball"],
   links: {
@@ -16,6 +19,42 @@ export const profile = {
     linkedin: "https://www.linkedin.com/in/piyush-rajput-414b21410",
   },
 } as const;
+
+export type EducationMilestone = {
+  number: string;
+  stage: string;
+  qualification: string;
+  discipline: string;
+  status: string;
+  summary: string;
+  institution?: string;
+  location?: string;
+  specialization?: string;
+  phase?: string;
+  confirmed?: string;
+};
+
+export const education: {
+  introduction: string;
+  milestones: EducationMilestone[];
+  coursework: string[];
+  interests: string[];
+} = {
+  introduction: "Learning the fundamentals, then finding what they can become. My education connects programming, mathematics, and AI with practical questions in software and physical systems.",
+  milestones: [
+    {
+      number: "01", stage: "THE FOUNDATIONS", qualification: "Higher Secondary", discipline: "Science stream", status: "Completed",
+      summary: "Completed higher secondary education in the Science stream before continuing into Computer Science and Engineering.",
+    },
+    {
+      number: "02", stage: "THE CURRENT CHAPTER", qualification: "B.Tech. (Honours)", discipline: "Computer Science and Engineering", status: "Currently pursuing",
+      institution: "Karnavati University", location: "Ahmedabad, Gujarat, India", specialization: "Artificial Intelligence and Machine Learning", phase: "First year", confirmed: "Last confirmed November 2026",
+      summary: "Building foundations in programming, mathematics, AI, and computer science while exploring practical applications through software projects, robotics, and embedded systems.",
+    },
+  ],
+  coursework: ["Fundamentals of Artificial Intelligence & FAI Lab", "Mathematics", "Programming for Problem Solving & PPS Lab", "Basic Electrical and Electronics Engineering & BEEE Lab", "Design Thinking and Innovation"],
+  interests: ["Artificial Intelligence and Machine Learning", "Generative AI and large language models", "Programming and software development", "Mathematics and problem-solving for computing", "Robotics, embedded systems, and hardware-software integration"],
+};
 
 export type Project = {
   slug: string;
@@ -89,10 +128,42 @@ export const projects: Project[] = [
 ];
 
 export const skillGroups = [
-  { title: "Project experience", level: "Used in projects", items: ["HTML", "CSS", "JavaScript", "Python", "MySQL", "Tkinter", "Three.js", "Blender", "Botpress AI"] },
-  { title: "Software in progress", level: "Learning / developing", items: ["React.js", "Node.js", "Express.js", "Web application development"] },
-  { title: "Physical systems", level: "Exploring", items: ["Raspberry Pi", "ESP32 / ESP32-S3", "Sensors", "Motor-control electronics", "SPI", "IoT circuits"] },
-  { title: "Intelligence & image", level: "Academic study / exploration", items: ["Generative AI", "Conversational AI", "Large Language Models", "Transformers & attention", "Gemini", "AI visual storytelling"] },
+  {
+    id: "frontend", title: "Frontend", level: "Hands-on experience", introduction: "Structure, layout, logic, and motion — the tools I use to turn an idea into an interactive web experience.",
+    items: ["HTML", "CSS", "JavaScript", "GSAP"],
+  },
+  {
+    id: "programming", title: "Programming", level: "Project work and academic exposure", introduction: "Python through exercises and project work; C through PPS coursework; C++ through academic exposure.",
+    items: ["Python — project and academic work", "C / Turbo C — PPS coursework", "C++ — academic exposure"],
+  },
+  {
+    id: "data-backend", title: "Data & backend", level: "Project use and practical exploration", introduction: "MySQL is part of the BRTS project. Flask, SQLite, and EJS belong to practical exploration; MongoDB remains limited, unfinished exposure.",
+    items: ["MySQL — project use", "Flask — exploration", "SQLite — exploration", "EJS — exploration", "MongoDB — limited exposure"],
+  },
+  {
+    id: "intelligence", title: "AI & GenAI", level: "Coursework and applied experimentation", introduction: "Studying how intelligent systems work through coursework and presentations, alongside conversational AI and generative media experiments.",
+    items: ["AI fundamentals and ML workflow", "Supervised, unsupervised & reinforcement learning", "Large Language Models", "Transformers & attention", "Query / Key / Value", "Conversational AI", "Botpress", "Gemini", "Nano Banana"],
+  },
+  {
+    id: "three-dimensional", title: "3D & visualization", level: "Used in a project", introduction: "Three.js and Blender connect to Tridix: preparing 3D assets and integrating them into a browser-based physics-learning experience.",
+    items: ["Three.js", "Blender", "3D model integration for the web"],
+  },
+  {
+    id: "robotics", title: "Robotics", level: "Hardware experience and architecture exploration", introduction: "Camera input, sensing, control signals, and architecture planning form my current hardware explorations.",
+    items: ["Raspberry Pi 3 & Raspberry Pi 4", "Camera modules / OV5647", "Picamera2 & camera command-line tools", "Camera frame handling", "L298N motor driver", "DC geared motors & four-wheel platforms", "IR line sensors", "US-100 / ultrasonic sensors", "Servo motors", "Buck converters", "LCD modules & buzzers", "GPIO connections & motor-control mapping", "SPI architecture", "Perception and control workload separation"],
+  },
+  {
+    id: "embedded", title: "Embedded & IoT", level: "Prototyping and experimentation", introduction: "Boards, indicators, displays, and connectivity explored through embedded hardware work, including the Smart Calendar concept.",
+    items: ["ESP32 & ESP32-S3", "WS2812B addressable LEDs", "DS3231 real-time clock", "LCD / OLED & I2C", "74HC595 shift registers", "74AHCT125 level shifting", "LED protection & power considerations", "Wi-Fi-connected device concepts", "Offline-first device behaviour", "Physical-button interaction"],
+  },
+  {
+    id: "workflow", title: "Workflow tools", level: "Development use and basic experimentation", introduction: "The everyday development environment, plus browser automation and basic structured data handling.",
+    items: ["Visual Studio Code", "Turbo C", "Raspberry Pi Imager", "Balena Etcher", "Selenium — basic experimentation", "CSV — basic data handling"],
+  },
+  {
+    id: "learning", title: "Currently learning", level: "In progress", introduction: "Strengthening my frontend foundations through React.js. Learning is part of the work, and its status stays visible.",
+    items: ["React.js"],
+  },
 ] as const;
 
 export const achievements = [

@@ -89,7 +89,7 @@ export default function MindExplorer() {
   const showScene = visible && canRender && !failed;
   return (
     <div ref={root} className={styles.explorer}>
-      <div className={styles.visual}>
+      <div className={styles.visual} data-mind-visual>
         <div className={styles.crosshair} />
         <span className={styles.coordinate}>FIG. 02 / A CONNECTED MIND</span>
         {(!showScene || !ready) && <OrbitalFallback />}
@@ -99,7 +99,7 @@ export default function MindExplorer() {
         <span className={`${styles.node} ${styles.nodeThree}`}>Z / PHYSICAL SYSTEMS</span>
         <span className={styles.diagramNote}>THREE WORLDS. ONE CURIOSITY.</span>
       </div>
-      <div className={styles.content}>
+      <div className={styles.content} data-mind-content>
         <div role="tablist" aria-label="Explore areas of interest" className={styles.tabs}>
           {worlds.map((item, index) => <button ref={(element) => { tabs.current[index] = element; }} id={`mind-tab-${index}`} key={item.number} type="button" role="tab" aria-selected={selected === index} aria-controls={`mind-panel-${index}`} tabIndex={selected === index ? 0 : -1} onClick={() => setSelected(index)} onKeyDown={(event) => handleTabKey(event, index)}><span>{item.number}</span>{item.title}<span aria-hidden="true">↗</span></button>)}
         </div>

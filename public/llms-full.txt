@@ -4,10 +4,49 @@ I'm Piyush, a Computer Science and Engineering student at Karnavati University. 
 
 ## Education
 
-- B.Tech (Hons.) in Computer Science and Engineering
-- Karnavati University
-- Specialization: Artificial Intelligence and Machine Learning
-- Earlier education: Higher secondary education in the Science stream
+Learning the fundamentals, then finding what they can become. My education connects programming, mathematics, and AI with practical questions in software and physical systems.
+
+### Higher Secondary
+
+**Discipline / stream:** Science stream
+
+**Status:** Completed
+
+Completed higher secondary education in the Science stream before continuing into Computer Science and Engineering.
+
+### B.Tech. (Honours)
+
+**Discipline / stream:** Computer Science and Engineering
+
+**Status:** Currently pursuing
+
+**Institution:** Karnavati University
+
+**Location:** Ahmedabad, Gujarat, India
+
+**Specialization:** Artificial Intelligence and Machine Learning
+
+**Academic stage:** First year
+
+Last confirmed November 2026
+
+Building foundations in programming, mathematics, AI, and computer science while exploring practical applications through software projects, robotics, and embedded systems.
+
+### Current coursework
+
+- Fundamentals of Artificial Intelligence & FAI Lab
+- Mathematics
+- Programming for Problem Solving & PPS Lab
+- Basic Electrical and Electronics Engineering & BEEE Lab
+- Design Thinking and Innovation
+
+### Academic interests
+
+- Artificial Intelligence and Machine Learning
+- Generative AI and large language models
+- Programming and software development
+- Mathematics and problem-solving for computing
+- Robotics, embedded systems, and hardware-software integration
 
 ## Interests
 
@@ -18,9 +57,9 @@ Artificial intelligence, Generative AI, Software engineering, Browser-based 3D, 
 - [GitHub](https://github.com/pepieglitched)
 - [LinkedIn](https://www.linkedin.com/in/piyush-rajput-414b21410)
 
-# Projects
+## Projects
 
-## Tridix
+### Tridix
 
 [Project notes](/projects/tridix/)
 
@@ -32,23 +71,23 @@ Physics, beyond the flat page. A browser-based learning experience that brings c
 
 **Technologies / scope:** HTML, CSS, JavaScript, Three.js, Blender
 
-### Approach
+#### Approach
 
 - Built the web experience using HTML, CSS, and JavaScript.
 - Used Blender in the model workflow and Three.js to bring 3D content into the browser.
 - Explored AVIF images, lazy loading, and font preloading to improve media delivery.
 
-### Outcome
+#### Outcome
 
 A built 3D physics-learning website. The supplied record describes the project as previously unhosted.
 
-### Documented limits
+#### Documented limits
 
 - A current public deployment and repository URL have not been supplied.
 - The exact model inventory and interaction capabilities remain to be documented.
 - Historical performance scores are omitted because their project/version attribution needs verification.
 
-## LegalOne
+### LegalOne
 
 [Project notes](/projects/legalone/)
 
@@ -60,22 +99,22 @@ A conversational starting point for Indian legal information, explored with team
 
 **Technologies / scope:** Botpress AI, Conversational AI
 
-### Approach
+#### Approach
 
 - Worked with team Binary Bandits on the OlympAI project.
 - Used Botpress AI to develop the chatbot experience around Indian legal information.
 - Explored applying conversational AI to a focused information domain.
 
-### Outcome
+#### Outcome
 
 Team Binary Bandits cleared Stage 2 of OlympAI.
 
-### Documented limits
+#### Documented limits
 
 - The precise prototype scope, individual role, and public deployment are not documented in the supplied record.
 - This is a legal-information chatbot concept; no legal accuracy guarantee or professional endorsement is claimed.
 
-## Meghdoot AI
+### Meghdoot AI
 
 [Project notes](/projects/meghdoot-ai/)
 
@@ -87,22 +126,22 @@ A flood-detection project explored across an app, web application, and website f
 
 **Technologies / scope:** App, Web application, Website
 
-### Approach
+#### Approach
 
 - Participated in Smart India Hackathon during the first year of B.Tech.
 - Worked with the SIH team on Meghdoot AI, described across an app, web application, and website.
 - Presented the project through the college-level selection process.
 
-### Outcome
+#### Outcome
 
 Qualified through the college-level round and was among the top 90 teams.
 
-### Documented limits
+#### Documented limits
 
 - The detection method, model, data sources, technical stack, and individual responsibilities have not been supplied.
 - College-level qualification is the documented result; no national finalist or winner status is claimed.
 
-## BRTS Bus Route System
+### BRTS Bus Route System
 
 [Project notes](/projects/brts/)
 
@@ -114,22 +153,22 @@ From command line to interface: working with bus-route information using Python 
 
 **Technologies / scope:** Python, MySQL, Tkinter
 
-### Approach
+#### Approach
 
 - Developed a terminal-based prototype using Python and MySQL.
 - Later worked on a Tkinter graphical interface.
 - Explored the transition from a command-line workflow toward a desktop application.
 
-### Outcome
+#### Outcome
 
 A terminal prototype and subsequent GUI development work.
 
-### Documented limits
+#### Documented limits
 
 - The exact implemented route features and database schema are not supplied.
 - A completed, database-connected Tkinter interface is not confirmed.
 
-## Smart Calendar
+### Smart Calendar
 
 [Project notes](/projects/smart-calendar/)
 
@@ -141,22 +180,22 @@ A physical student calendar concept: dates, tasks, reminders, and a little more 
 
 **Technologies / scope:** ESP32 / ESP32-S3, WS2812B LEDs, 20×4 LCD, DS3231 RTC
 
-### Approach
+#### Approach
 
 - Explored an ESP32-based controller with programmable LED calendar indicators.
 - Considered an LCD task display, RTC timekeeping, reminder controls, and Wi-Fi connectivity.
 - Experimented with circuit configuration, output control, display integration, and power requirements.
 
-### Outcome
+#### Outcome
 
 Hardware and circuit exploration in development; a completed working prototype is not confirmed.
 
-### Documented limits
+#### Documented limits
 
 - Component integration and working features require prototype evidence.
 - Google Classroom integration remains a planned feature, not a completed implementation.
 
-## Autonomous Driving Robot
+### Autonomous Driving Robot
 
 [Project notes](/projects/autonomous-robot/)
 
@@ -168,67 +207,142 @@ Exploring the bridge from perception to movement, through a proposed two-board a
 
 **Technologies / scope:** Raspberry Pi 3, Raspberry Pi 4, SPI, IR / ultrasonic sensors, L298N
 
-### Approach
+#### Approach
 
 - Proposed separating camera and AI processing on Raspberry Pi 4 from sensor and motor control on Raspberry Pi 3.
 - Planned SPI communication between the boards.
 - Considered cameras, IR and ultrasonic sensors, an L298N motor driver, and DC geared motors within competition constraints.
 
-### Outcome
+#### Outcome
 
 Robot architecture and component planning. No completed autonomous test performance or competition result is confirmed.
 
-### Documented limits
+#### Documented limits
 
 - A fully assembled robot, implemented perception method, and working board communication are not verified.
 - No award, rank, or qualification is claimed.
 
-# Skills and areas of exploration
+## Skills and areas of exploration
 
-## Project experience
+Experience is presented in context: hands-on work, coursework, practical exploration, limited exposure, and current learning are distinct.
 
-Used in projects
+### Frontend
+
+**Context:** Hands-on experience
+
+Structure, layout, logic, and motion — the tools I use to turn an idea into an interactive web experience.
 
 - HTML
 - CSS
 - JavaScript
-- Python
-- MySQL
-- Tkinter
-- Three.js
-- Blender
-- Botpress AI
+- GSAP
 
-## Software in progress
+### Programming
 
-Learning / developing
+**Context:** Project work and academic exposure
 
-- React.js
-- Node.js
-- Express.js
-- Web application development
+Python through exercises and project work; C through PPS coursework; C++ through academic exposure.
 
-## Physical systems
+- Python — project and academic work
+- C / Turbo C — PPS coursework
+- C++ — academic exposure
 
-Exploring
+### Data & backend
 
-- Raspberry Pi
-- ESP32 / ESP32-S3
-- Sensors
-- Motor-control electronics
-- SPI
-- IoT circuits
+**Context:** Project use and practical exploration
 
-## Intelligence & image
+MySQL is part of the BRTS project. Flask, SQLite, and EJS belong to practical exploration; MongoDB remains limited, unfinished exposure.
 
-Academic study / exploration
+- MySQL — project use
+- Flask — exploration
+- SQLite — exploration
+- EJS — exploration
+- MongoDB — limited exposure
 
-- Generative AI
-- Conversational AI
+### AI & GenAI
+
+**Context:** Coursework and applied experimentation
+
+Studying how intelligent systems work through coursework and presentations, alongside conversational AI and generative media experiments.
+
+- AI fundamentals and ML workflow
+- Supervised, unsupervised & reinforcement learning
 - Large Language Models
 - Transformers & attention
+- Query / Key / Value
+- Conversational AI
+- Botpress
 - Gemini
-- AI visual storytelling
+- Nano Banana
+
+### 3D & visualization
+
+**Context:** Used in a project
+
+Three.js and Blender connect to Tridix: preparing 3D assets and integrating them into a browser-based physics-learning experience.
+
+- Three.js
+- Blender
+- 3D model integration for the web
+
+### Robotics
+
+**Context:** Hardware experience and architecture exploration
+
+Camera input, sensing, control signals, and architecture planning form my current hardware explorations.
+
+- Raspberry Pi 3 & Raspberry Pi 4
+- Camera modules / OV5647
+- Picamera2 & camera command-line tools
+- Camera frame handling
+- L298N motor driver
+- DC geared motors & four-wheel platforms
+- IR line sensors
+- US-100 / ultrasonic sensors
+- Servo motors
+- Buck converters
+- LCD modules & buzzers
+- GPIO connections & motor-control mapping
+- SPI architecture
+- Perception and control workload separation
+
+### Embedded & IoT
+
+**Context:** Prototyping and experimentation
+
+Boards, indicators, displays, and connectivity explored through embedded hardware work, including the Smart Calendar concept.
+
+- ESP32 & ESP32-S3
+- WS2812B addressable LEDs
+- DS3231 real-time clock
+- LCD / OLED & I2C
+- 74HC595 shift registers
+- 74AHCT125 level shifting
+- LED protection & power considerations
+- Wi-Fi-connected device concepts
+- Offline-first device behaviour
+- Physical-button interaction
+
+### Workflow tools
+
+**Context:** Development use and basic experimentation
+
+The everyday development environment, plus browser automation and basic structured data handling.
+
+- Visual Studio Code
+- Turbo C
+- Raspberry Pi Imager
+- Balena Etcher
+- Selenium — basic experimentation
+- CSV — basic data handling
+
+### Currently learning
+
+**Context:** In progress
+
+Strengthening my frontend foundations through React.js. Learning is part of the work, and its status stays visible.
+
+- React.js
 
 ## Competition milestones
 

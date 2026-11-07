@@ -1,28 +1,117 @@
-'use client';
-import { lazy, Suspense, useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
-import SignalGlyph from './SignalGlyph';
-import styles from './Navigation.module.scss';
-const links = [['The mind', '/#mind'], ['Selected work', '/#work'], ['Play', '/#signal-run'], ['Let’s talk', '/#contact']] as const;
-const NavigationMenu = lazy(() => import('./NavigationMenu'));
+"use client";
 
+import { lazy, Suspense, useEffect, useRef, useState, type PointerEvent } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import styles from './Navigation.module.scss';
+
+const links = [
+  ['The Mind', 'mind'], ['Education', 'education'], ['Skills', 'skills'],
+  ['Selected Work', 'work'], ['Play', 'signal-run'], ['Let’s Talk', 'contact'],
+] as const;
+const NavigationMenu = lazy(() => import('./NavigationMenu'));
+const isChapter = (id: string) => links.some(([, section]) => section === id);
+
+/** CSS owns the glass and reflections; Motion owns only the mobile disclosure. */
 export default function Navigation() {
   const [open, setOpen] = useState(false);
+  const [menuLoaded, setMenuLoaded] = useState(false);
+  const [active, setActive] = useState('');
+  const path = usePathname();
   const toggle = useRef<HTMLButtonElement>(null);
   const nav = useRef<HTMLElement>(null);
+  const contact = useRef<HTMLAnchorElement>(null);
+  const frame = useRef<number | null>(null);
+  const enabled = useRef(false);
+  const bounds = useRef<DOMRect | null>(null);
+  const contactBounds = useRef<DOMRect | null>(null);
+  const point = useRef({ x: 50, y: 0, magnetX: 0, magnetY: 0 });
+
+  useEffect(() => {
+    const desktop = window.matchMedia('(min-width: 1100px)');
+    const closeAtDesktop = () => { if (desktop.matches) setOpen(false); };
+    desktop.addEventListener('change', closeAtDesktop);
+    return () => desktop.removeEventListener('change', closeAtDesktop);
+  }, []);
+
   useEffect(() => {
     if (!open) return;
-    const close = (e: KeyboardEvent) => { if (e.key === 'Escape') { setOpen(false); toggle.current?.focus(); } };
-    const outside = (e: PointerEvent) => { if (!nav.current?.contains(e.target as Node)) setOpen(false); };
+    const close = (event: KeyboardEvent) => { if (event.key === 'Escape') { setOpen(false); toggle.current?.focus(); } };
+    const outside = (event: globalThis.PointerEvent) => { if (!nav.current?.contains(event.target as Node)) setOpen(false); };
     document.addEventListener('keydown', close);
     document.addEventListener('pointerdown', outside);
     return () => { document.removeEventListener('keydown', close); document.removeEventListener('pointerdown', outside); };
   }, [open]);
-  const menuLinks = links.map(([label, href], i) => <a key={href} href={href} onClick={() => setOpen(false)}><span>0{i + 1}</span>{label}<span aria-hidden="true">↗</span></a>);
-  return <header className={styles.header}><nav ref={nav} aria-label="Main navigation" className={styles.nav}>
-    <Link href="/" className={styles.identity} aria-label="Piyush Rajput — home"><SignalGlyph /><span>PIYUSH RAJPUT<small>STUDENT. THINKER. BUILDER.</small></span></Link>
-    <div className={styles.desktop}>{links.map(([label, href], i) => <a key={href} href={href} className={i === 3 ? styles.contact : ''}>{label}{i === 3 && <span aria-hidden="true">↗</span>}</a>)}</div>
-    <button ref={toggle} className={styles.toggle} type="button" aria-expanded={open} aria-controls="mobile-navigation" onClick={() => setOpen(!open)}>{open ? 'Close −' : 'Menu +'}</button>
-    {open && <Suspense fallback={<div id="mobile-navigation" className={styles.mobile}>{menuLinks}</div>}><NavigationMenu>{menuLinks}</NavigationMenu></Suspense>}
-  </nav></header>;
+
+  useEffect(() => {
+    if (path !== '/') return;
+    const readHash = () => { const id = window.location.hash.slice(1); setActive(isChapter(id) ? id : ''); };
+    readHash();
+    window.addEventListener('hashchange', readHash);
+    const observer = new IntersectionObserver(entries => {
+      const entered = entries.filter(entry => entry.isIntersecting);
+      if (entered.length) {
+        const nearest = entered.reduce((best, entry) => Math.abs(entry.boundingClientRect.top) < Math.abs(best.boundingClientRect.top) ? entry : best);
+        setActive(nearest.target.id);
+      }
+    }, { rootMargin: '-18% 0px -60% 0px', threshold: 0 });
+    links.forEach(([, id]) => { const section = document.getElementById(id); if (section) observer.observe(section); });
+    return () => { observer.disconnect(); window.removeEventListener('hashchange', readHash); };
+  }, [path]);
+
+  useEffect(() => {
+    const element = nav.current;
+    if (!element) return;
+    const measure = () => { bounds.current = element.getBoundingClientRect(); };
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    return () => { observer.disconnect(); if (frame.current !== null) cancelAnimationFrame(frame.current); };
+  }, []);
+
+  function scheduleReflection() {
+    if (frame.current !== null) return;
+    frame.current = requestAnimationFrame(() => {
+      frame.current = null;
+      nav.current?.style.setProperty('--shine-x', `${point.current.x}%`);
+      nav.current?.style.setProperty('--shine-y', `${point.current.y}%`);
+      nav.current?.style.setProperty('--reflection', '1');
+      contact.current?.style.setProperty('--magnet-x', `${point.current.magnetX}px`);
+      contact.current?.style.setProperty('--magnet-y', `${point.current.magnetY}px`);
+    });
+  }
+  function enterGlass(event: PointerEvent<HTMLElement>) {
+    enabled.current = window.matchMedia('(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)').matches;
+    bounds.current = event.currentTarget.getBoundingClientRect();
+  }
+  function moveGlass(event: PointerEvent<HTMLElement>) {
+    const rectangle = bounds.current;
+    if (!enabled.current || !rectangle) return;
+    point.current.x = Math.min(100, Math.max(0, (event.clientX - rectangle.left) / rectangle.width * 100));
+    point.current.y = Math.min(100, Math.max(0, (event.clientY - rectangle.top) / rectangle.height * 100));
+    scheduleReflection();
+  }
+  function leaveGlass() {
+    if (frame.current !== null) { cancelAnimationFrame(frame.current); frame.current = null; }
+    enabled.current = false;
+    point.current.magnetX = 0; point.current.magnetY = 0;
+    nav.current?.style.setProperty('--reflection', '0');
+    contact.current?.style.setProperty('--magnet-x', '0px');
+    contact.current?.style.setProperty('--magnet-y', '0px');
+  }
+
+  const menuLinks = links.map(([label, id], index) => <a key={id} href={`/#${id}`} aria-current={path === '/' && active === id ? 'location' : undefined} onClick={() => { setActive(id); setOpen(false); }} className={id === 'contact' ? styles.mobileContact : undefined}><span>0{index + 1}</span>{label}<span aria-hidden="true">↗</span></a>);
+  return <header className={styles.header}>
+    <nav ref={nav} aria-label="Main navigation" className={styles.nav} onPointerEnter={enterGlass} onPointerMove={moveGlass} onPointerLeave={leaveGlass}>
+      <Link href="/" className={styles.identity} aria-label="Piyush Rajput — home">PIYUSH RAJPUT</Link>
+      <div className={styles.desktop}>{links.map(([label, id]) => <a ref={id === 'contact' ? contact : undefined} key={id} href={`/#${id}`} className={id === 'contact' ? styles.contact : styles.navLink} aria-current={path === '/' && active === id ? 'location' : undefined} onClick={() => setActive(id)} onPointerEnter={id === 'contact' ? event => { contactBounds.current = event.currentTarget.getBoundingClientRect(); } : undefined} onPointerMove={id === 'contact' ? event => {
+        const rectangle = contactBounds.current;
+        if (!enabled.current || !rectangle) return;
+        point.current.magnetX = ((event.clientX - rectangle.left) / rectangle.width - .5) * 5;
+        point.current.magnetY = ((event.clientY - rectangle.top) / rectangle.height - .5) * 4;
+        scheduleReflection();
+      } : undefined} onPointerLeave={id === 'contact' ? () => { point.current.magnetX = 0; point.current.magnetY = 0; if (enabled.current) scheduleReflection(); } : undefined}><span className={id === 'contact' ? styles.contactInner : undefined}>{label}{id === 'contact' && <span aria-hidden="true">↗</span>}</span></a>)}</div>
+      <button ref={toggle} className={styles.toggle} type="button" aria-expanded={open} aria-controls="mobile-navigation" onClick={() => { setMenuLoaded(true); setOpen(!open); }}><span>{open ? 'Close' : 'Menu'}</span><span className={styles.menuMark} aria-hidden="true">{open ? '−' : '+'}</span></button>
+      {menuLoaded && <Suspense fallback={open ? <div id="mobile-navigation" className={styles.mobile}>{menuLinks}</div> : null}><NavigationMenu open={open}>{menuLinks}</NavigationMenu></Suspense>}
+    </nav>
+  </header>;
 }

@@ -13,7 +13,9 @@ export const metadata: Metadata = {
   description: 'From curiosity to creation. Explore Piyush Rajput’s work in AI, interactive software, 3D web, and physical systems — with a playable intermission.',
   alternates:{ canonical:'/' }, authors:[{name:'Piyush Rajput'}],
   openGraph:{ type:'website', locale:'en_IN', siteName:'Piyush Rajput', title:'Piyush Rajput — The Builder’s Mind', description:'AI. Software. Physical systems. A portfolio you can play a part in.', url:siteUrl, images:[{url:'/og.png',width:1200,height:630,alt:'Piyush Rajput — The Builder’s Mind'}] },
-  twitter:{card:'summary_large_image',images:['/og.png']}, icons:{icon:'/icon.svg'}, robots:{index:true,follow:true},
+  twitter:{card:'summary_large_image',images:['/og.png']}, robots:{index:true,follow:true},
+  // The wordmark is the only branding. Suppress the browser's implicit favicon request.
+  icons: { icon: 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%221%22 height=%221%22/%3E' },
 };
 export const viewport: Viewport = { themeColor:'#F3F0E8' };
 export default function RootLayout({children}:{children:React.ReactNode}) {

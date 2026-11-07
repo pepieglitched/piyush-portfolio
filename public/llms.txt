@@ -1,15 +1,16 @@
 # Piyush Rajput
 
-> Computer Science and Engineering student at Karnavati University, specializing in AI/ML. Exploring AI, interactive software, browser-based 3D, robotics, and embedded systems.
+> Computer Science and Engineering student at Karnavati University in Ahmedabad, specializing in AI/ML. Exploring AI, interactive software, browser-based 3D, robotics, and embedded systems.
 
-From curiosity to creation. This portfolio distinguishes built work, prototypes, proposed architecture, and learning.
+From curiosity to creation. This portfolio distinguishes built work, prototypes, proposed architecture, coursework, exploration, and current learning. Signal Run is an optional original portfolio interaction.
 
-## Pages
+## Public information
 
-- [Portfolio](/): The Builder's Mind, a nine-chapter editorial portfolio with an optional original Signal Run game.
-- [About](/about.md): Biography, education, interests, and public profiles.
+- [Portfolio](/): The Builder's Mind, an editorial portfolio with a playable intermission.
+- [About](/about.md): Biography, verified education, interests, and public profiles.
+- [Education](/education.md): Academic stages, confirmed programme details, coursework, and interests.
 - [Projects](/projects.md): Accurate project records and development status.
-- [Skills](/skills.md): Project experience distinguished from learning and exploration.
+- [Skills](/skills.md): Hands-on experience distinguished from learning and exploration.
 - [Full public portfolio](/llms-full.txt): Detailed text representation.
 
 ## Project resources

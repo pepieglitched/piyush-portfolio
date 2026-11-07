@@ -2,7 +2,7 @@
 @import 'lenis/dist/lenis.css';
 :root { --paper:#f3f0e8; --ink:#0b0c0f; --red:#ed3345; --gutter:clamp(1.25rem,4.5vw,5rem); }
 * { box-sizing:border-box; }
-html { scroll-behavior:auto; scroll-padding-top:6rem; }
+html { scroll-behavior:auto; scroll-padding-top:7.5rem; }
 body { margin:0; background:$paper; color:$ink; font-family:var(--font-space),Arial,sans-serif; -webkit-font-smoothing:antialiased; }
 body::after { content:''; position:fixed; inset:0; pointer-events:none; z-index:20; opacity:.1; background-image:url('/grain.svg'); }
 ::selection { background:$red; color:$paper; }
@@ -30,4 +30,16 @@ main { overflow:clip; }
 .text-link span { transition:transform .25s; }
 .text-link:hover span { transform:translate(4px,-4px); }
 .rule { border:0; border-top:1px solid $line; }
+.motion-chapter { position:relative; }
+.motion-word { display:inline-block; vertical-align:baseline; }
+// SplitText's clip needs room for the display fonts' descenders and italic overhang.
+.motion-word-mask { overflow-clip-margin:.2em; }
+.motion-chapter:not([data-motion-chapter=hero]) > section,
+.motion-chapter > footer { content-visibility:auto; contain-intrinsic-size:auto 1000px; }
+html:focus-within .motion-chapter > section,
+html:focus-within .motion-chapter > footer,
+html:has(:target) .motion-chapter > section,
+html:has(:target) .motion-chapter > footer,
+html[data-interacting=true] .motion-chapter > section,
+html[data-interacting=true] .motion-chapter > footer { content-visibility:visible; contain-intrinsic-size:none; }
 @media(prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } *,*::before,*::after { animation:none !important; transition:none !important; } }

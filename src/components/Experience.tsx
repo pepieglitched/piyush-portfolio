@@ -30,15 +30,29 @@ export default function Experience() {
       gsap.ticker.lagSmoothing(0);
       gsap.ticker.add(tick);
 
-      // Stop wheel inertia before the browser handles anchors, history, or keyboard navigation.
-      // The default event is preserved, including native focus, hash, and history behavior.
+      // Stop wheel inertia before a chapter jump or native history and keyboard navigation.
       const releaseToNative = () => { lenis.stop(); lenis.start(); };
       const anchor = (event: MouseEvent) => {
         if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
         const link = event.target instanceof Element ? event.target.closest<HTMLAnchorElement>('a[href]') : null;
         if (!link || link.download || (link.target && link.target !== '_self')) return;
         const url = new URL(link.href, window.location.href);
-        if (url.origin === window.location.origin && url.pathname === window.location.pathname && url.hash) releaseToNative();
+        if (url.origin !== window.location.origin || url.pathname !== window.location.pathname || !url.hash) return;
+        let target: HTMLElement | null = null;
+        try {target = document.getElementById(decodeURIComponent(url.hash.slice(1)));} catch {return;}
+        if (!target) return;
+        event.preventDefault();
+        releaseToNative();
+        const oldURL = window.location.href;
+        if (url.hash !== window.location.hash) {
+          window.history.pushState(window.history.state, '', `${url.pathname}${url.search}${url.hash}`);
+          window.dispatchEvent(new HashChangeEvent('hashchange', {oldURL, newURL: window.location.href}));
+        }
+        const keyboardActivation = event.detail === 0;
+        // Lenis reads scroll-padding and scroll-margin for element targets.
+        lenis.scrollTo(target, {duration: 1.05, onComplete: () => {
+          if (keyboardActivation && target?.isConnected) {target.setAttribute('tabindex', '-1'); target.focus({preventScroll: true});}
+        }});
       };
       const keyboard = (event: KeyboardEvent) => {
         if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey) return;
@@ -72,6 +86,8 @@ export default function Experience() {
     if (!contextSafe) return;
     const media = gsap.matchMedia();
     media.add('(prefers-reduced-motion: no-preference)', () => {
+      // Home chapters have their own scoped drivers; retain route entrances for the case studies.
+      if (path === '/') return;
       const intro = gsap.timeline({ defaults: motionConfig });
       const heroLines = gsap.utils.toArray<HTMLElement>('[data-hero-line]');
       const heroNotes = gsap.utils.toArray<HTMLElement>('[data-hero-note]');
@@ -86,6 +102,7 @@ export default function Experience() {
       });
     });
     media.add('(min-width: 900px) and (prefers-reduced-motion: no-preference)', () => {
+      if (path === '/') return;
       const portrait = document.querySelector<HTMLElement>('[data-hero-portrait]');
       const human = document.getElementById('human');
       if (portrait && human) gsap.to(portrait, { yPercent: 8, ease: 'none', scrollTrigger: { trigger: human, start: 'top top', end: 'bottom top', scrub: .7 } });

@@ -3,6 +3,21 @@ import { mkdir } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 const root = fileURLToPath(new URL('../', import.meta.url));
 await mkdir(`${root}public/images`, { recursive: true });
+// The extraction tool supplies only the silhouette matte. Every visible RGB pixel
+// comes from Piyush's original photograph, preserving his exact real appearance.
+const matte = await sharp(`${root}assets/source/hero-alpha-mask.png`).extractChannel(0).raw().toBuffer();
+await sharp(`${root}assets/source/hero.png`).joinChannel(matte, {raw:{width:1145,height:1374,channels:1}}).png().toFile(`${root}assets/source/hero-transparent.png`);
+await sharp(`${root}assets/source/hero-transparent.png`).png().toFile(`${root}public/images/hero-transparent.png`);
+for (const size of [640, 828, 1080, 1600]) {
+  await sharp(`${root}assets/source/hero-transparent.png`)
+    .resize({ width: size, withoutEnlargement: true })
+    .avif({ quality: 49, effort: 5 })
+    .toFile(`${root}public/images/hero-transparent-${size}.avif`);
+}
+if (process.argv.includes('--portrait-only')) {
+  console.log('Rebuilt transparent portrait and four responsive variants.');
+  process.exit(0);
+}
 for (const name of ['hero', 'cutout', 'quiet']) {
   for (const size of [640, 828, 1080, 1600]) {
     await sharp(`${root}assets/source/${name}.png`).resize({ width: size, withoutEnlargement: true }).webp({ quality: 82, effort: 5 }).toFile(`${root}public/images/${name}-${size}.webp`);

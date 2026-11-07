@@ -63,7 +63,7 @@ export default function SignalRun() {
     world.score = score;
     setHud(snap(world));
     transition(won ? 'won' : 'lost');
-    setMessage(won ? 'Mission complete. Achievement unlocked: Curious Mind. Three ideas collected.' : 'Signal lost. You can restart or continue to the laboratory.');
+    setMessage(won ? 'Mission complete. Achievement unlocked: Curious Mind. Three ideas collected.' : 'Signal lost. You can restart or continue to the skill set.');
     if (won) beep(880);
     setBest(previous => {
       const value = Math.max(previous, score);
@@ -286,10 +286,10 @@ export default function SignalRun() {
         {phase !== 'running' && <div className={styles.overlay}><div>
           <span className={styles.eyebrow}>{phase === 'won' ? 'ACHIEVEMENT UNLOCKED: CURIOUS MIND' : phase === 'lost' ? 'A BUG IS JUST ANOTHER LESSON' : phase === 'paused' ? 'TAKE YOUR TIME' : 'AN ORIGINAL PLAYABLE INTERMISSION'}</span>
           <h3>{phase === 'won' ? <>MISSION<br />COMPLETE.</> : phase === 'lost' ? <>SIGNAL<br />LOST.</> : phase === 'paused' ? 'PAUSED.' : <>IDEAS DON’T<br />COLLECT THEMSELVES.</>}</h3>
-          <p>{phase === 'won' ? 'Three cores. One curious mind. Keep exploring the experiments behind the experience.' : phase === 'lost' ? 'Debug, retry, repeat. Every builder knows the process.' : phase === 'paused' ? 'Your ideas are right where you left them.' : 'A tiny robot. Three energy cores. A few bugs along the way. Sound familiar?'}</p>
+          <p>{phase === 'won' ? 'Three cores. One curious mind. Keep exploring the skills behind the experience.' : phase === 'lost' ? 'Debug, retry, repeat. Every builder knows the process.' : phase === 'paused' ? 'Your ideas are right where you left them.' : 'A tiny robot. Three energy cores. A few bugs along the way. Sound familiar?'}</p>
           <div className={styles.actions}>
             <button className={styles.primary} onClick={() => start(phase !== 'paused')}>{phase === 'paused' ? 'RESUME →' : phase === 'won' || phase === 'lost' ? 'PLAY AGAIN ↻' : 'PRESS START →'}</button>
-            {(phase === 'won' || phase === 'lost') && <a href="#laboratory">TO THE LAB ↗</a>}
+            {(phase === 'won' || phase === 'lost') && <a href="#skills">TO THE SKILLS ↗</a>}
           </div>
         </div></div>}
       </div>
@@ -301,7 +301,7 @@ export default function SignalRun() {
           <button onClick={() => { if (phase === 'running') { transition('paused'); setMessage('Game paused.'); } else if (phase === 'paused') start(false); }} disabled={phase !== 'running' && phase !== 'paused'}>{phase === 'paused' ? 'RESUME' : 'PAUSE'}</button>
           <button onClick={() => start()}>RESTART</button>
           <button onClick={() => { void toggleAudio(); }} aria-pressed={!muted} aria-label={muted ? 'Enable game sounds' : 'Mute game sounds'}>{muted ? 'SOUND OFF' : 'SOUND ON'}</button>
-          <a href="#laboratory" onClick={() => { if (phase === 'running') transition('paused'); }}>SKIP ↗</a>
+          <a href="#skills" onClick={() => { if (phase === 'running') transition('paused'); }}>SKIP ↗</a>
         </div>
       </div>
       <div className={styles.playControls}>
