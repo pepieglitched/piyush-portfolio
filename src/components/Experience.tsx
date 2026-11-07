@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
-import Lenis from 'lenis';
+import LocomotiveScroll from 'locomotive-scroll';
+import { ANCHOR_TRAVEL_EVENT } from '@/lib/scroll-events';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 export const motionConfig = { ease: 'power3.out', duration: .85 } as const;
@@ -13,46 +14,110 @@ export const motionConfig = { ease: 'power3.out', duration: .85 } as const;
 /** GSAP owns only data-reveal/hero/portrait transforms; other systems have their own elements. */
 export default function Experience() {
   const path = usePathname();
-  useEffect(() => {
-    // Touch browsers retain native momentum and anchor scrolling.
-    const media = window.matchMedia('(prefers-reduced-motion: reduce), (pointer: coarse)');
-    let dispose = () => {};
-    const setup = () => {
-      dispose();
-      dispose = () => {};
-      if (media.matches) return;
-      const lenis = new Lenis({ autoRaf: false, smoothWheel: true, syncTouch: false, anchors: false, duration: 1.05,
-        stopInertiaOnNavigate: true,
-        prevent: (node) => node.hasAttribute('data-lenis-prevent'), });
-      const tick = (seconds: number) => lenis.raf(seconds * 1000);
-      lenis.on('scroll', ScrollTrigger.update);
-      // Lenis follows GSAP's one clock. Real elapsed time avoids delayed scrolling after a long frame.
-      gsap.ticker.lagSmoothing(0);
-      gsap.ticker.add(tick);
+  const releaseScroll = useRef<(() => void) | undefined>(undefined);
 
-      // Stop wheel inertia before a chapter jump or native history and keyboard navigation.
-      const releaseToNative = () => { lenis.stop(); lenis.start(); };
+  useEffect(() => {
+    // Locomotive v5 drives native window scroll, so ScrollTrigger needs no proxy.
+    const media = window.matchMedia('(prefers-reduced-motion: reduce), (pointer: coarse)');
+    const root = document.documentElement;
+    let dispose: (() => void) | undefined;
+
+    const setup = () => {
+      dispose?.();
+      dispose = undefined;
+      if (media.matches) return;
+      let scroll: LocomotiveScroll | undefined;
+      let disconnect: (() => void) | undefined;
+      let frame = requestAnimationFrame(() => {
+        const instance = new LocomotiveScroll({
+          autoStart: false,
+          lenisOptions: { autoRaf: false, smoothWheel: true, syncTouch: false, anchors: false },
+          initCustomTicker: render => gsap.ticker.add(render),
+          destroyCustomTicker: render => gsap.ticker.remove(render),
+          scrollCallback: () => ScrollTrigger.update(),
+        });
+        scroll = instance;
+
+        // v5 creates its observer core on the next frame. Start after it has bound its listeners.
+        frame = requestAnimationFrame(() => {
+          frame = 0;
+          instance.start();
+          root.dataset.scrollEngine = 'locomotive';
+          disconnect = connectAnchors(instance);
+          ScrollTrigger.refresh();
+        });
+      });
+
+      dispose = () => {
+        cancelAnimationFrame(frame);
+        disconnect?.();
+        delete root.dataset.scrollEngine;
+        delete root.dataset.scrollOrientation;
+        if (!scroll) return;
+        const instance = scroll;
+        if (frame) {
+          // Let the constructor's queued init finish before destroying a not-yet-started instance.
+          requestAnimationFrame(() => instance.destroy());
+        } else {
+          instance.destroy();
+        }
+      };
+    };
+
+    function connectAnchors(scroll: LocomotiveScroll) {
+      let anchorTimer: number | undefined;
+      const setTravel = (active: boolean) => window.dispatchEvent(new CustomEvent(ANCHOR_TRAVEL_EVENT, { detail: active }));
+      const finishAnchor = () => {
+        if (anchorTimer === undefined) return;
+        window.clearTimeout(anchorTimer);
+        anchorTimer = undefined;
+        setTravel(false);
+      };
+      const releaseToNative = () => {
+        finishAnchor();
+        scroll.stop();
+        scroll.start();
+      };
       const anchor = (event: MouseEvent) => {
-        if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
         const link = event.target instanceof Element ? event.target.closest<HTMLAnchorElement>('a[href]') : null;
         if (!link || link.download || (link.target && link.target !== '_self')) return;
         const url = new URL(link.href, window.location.href);
-        if (url.origin !== window.location.origin || url.pathname !== window.location.pathname || !url.hash) return;
-        let target: HTMLElement | null = null;
-        try {target = document.getElementById(decodeURIComponent(url.hash.slice(1)));} catch {return;}
-        if (!target) return;
-        event.preventDefault();
-        releaseToNative();
-        const oldURL = window.location.href;
-        if (url.hash !== window.location.hash) {
-          window.history.pushState(window.history.state, '', `${url.pathname}${url.search}${url.hash}`);
-          window.dispatchEvent(new HashChangeEvent('hashchange', {oldURL, newURL: window.location.href}));
+        if (url.origin !== location.origin || url.pathname !== location.pathname || url.search !== location.search || !url.hash) return;
+        let target: HTMLElement | null;
+        try {
+          target = document.getElementById(decodeURIComponent(url.hash.slice(1)));
+        } catch {
+          return;
         }
+        if (!target) return;
+
+        event.preventDefault();
+        if (url.hash !== location.hash) {
+          const oldURL = location.href;
+          history.pushState(history.state, '', url);
+          window.dispatchEvent(new HashChangeEvent('hashchange', { oldURL, newURL: location.href }));
+        } else {
+          releaseToNative();
+        }
+        const destination = target;
         const keyboardActivation = event.detail === 0;
-        // Lenis reads scroll-padding and scroll-margin for element targets.
-        lenis.scrollTo(target, {duration: 1.05, onComplete: () => {
-          if (keyboardActivation && target?.isConnected) {target.setAttribute('tabindex', '-1'); target.focus({preventScroll: true});}
-        }});
+        // Locomotive 5.0.1's bundled engine expects the document padding as an explicit offset.
+        const padding = parseFloat(getComputedStyle(root).scrollPaddingTop) || 0;
+        const margin = parseFloat(getComputedStyle(destination).scrollMarginTop) || 0;
+        anchorTimer = window.setTimeout(finishAnchor, 1200);
+        setTravel(true);
+        scroll.scrollTo(destination, {
+          offset: -padding - margin,
+          duration: .85,
+          onComplete: () => {
+            finishAnchor();
+            if (keyboardActivation && destination.isConnected) {
+              destination.setAttribute('tabindex', '-1');
+              destination.focus({ preventScroll: true });
+            }
+          },
+        });
       };
       const keyboard = (event: KeyboardEvent) => {
         if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey) return;
@@ -61,26 +126,30 @@ export default function Experience() {
         if (target instanceof HTMLElement && (target.isContentEditable || target.closest('input, textarea, select, button'))) return;
         releaseToNative();
       };
+
       document.addEventListener('click', anchor, true);
       document.addEventListener('keydown', keyboard);
+      window.addEventListener('wheel', finishAnchor, { passive: true });
       window.addEventListener('popstate', releaseToNative);
       window.addEventListener('hashchange', releaseToNative);
-      dispose = () => {
+      releaseScroll.current = releaseToNative;
+      return () => {
+        finishAnchor();
         document.removeEventListener('click', anchor, true);
         document.removeEventListener('keydown', keyboard);
+        window.removeEventListener('wheel', finishAnchor);
         window.removeEventListener('popstate', releaseToNative);
         window.removeEventListener('hashchange', releaseToNative);
-        gsap.ticker.remove(tick);
-        lenis.off('scroll', ScrollTrigger.update);
-        lenis.destroy();
-        // Restore the GSAP defaults when this page's scrolling controller is removed.
-        gsap.ticker.lagSmoothing(500, 33);
+        releaseScroll.current = undefined;
       };
-    };
+    }
+
     setup();
     media.addEventListener('change', setup);
-    return () => { media.removeEventListener('change', setup); dispose(); };
-  }, [path]);
+    return () => { media.removeEventListener('change', setup); dispose?.(); };
+  }, []);
+
+  useEffect(() => { releaseScroll.current?.(); }, [path]);
 
   useGSAP((_context, contextSafe) => {
     if (!contextSafe) return;

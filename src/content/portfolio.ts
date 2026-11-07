@@ -167,10 +167,10 @@ export const skillGroups = [
 ] as const;
 
 export const achievements = [
-  { title: "BRAINWIZ", result: "25th place", context: "Amalthea ’25 · IIT Gandhinagar", year: "2025", description: "Secured 25th place in the written quiz competition at the 16th edition of Amalthea. Received a Certificate of Participation." },
-  { title: "OlympAI", result: "Stage 2 cleared", context: "LegalOne · Binary Bandits", description: "Team Binary Bandits cleared Stage 2 with the Botpress AI legal-information chatbot project." },
-  { title: "Smart India Hackathon", result: "College-level qualified", context: "Meghdoot AI · Among the top 90 teams", description: "Qualified through the college-level round during the first year of B.Tech with the flood-detection team project." },
-  { title: "LaserHacks", result: "Participation", context: "Lasell University, USA · UnfairSphere", year: "2025", description: "Participated online on November 15–16, 2025, presenting an ideation-stage cybersecurity concept with team UnfairSphere. No prototype was built. Received a Certificate of Participation." },
+  { id: "brainwiz", title: "BRAINWIZ", result: "25th place", context: "Amalthea ’25 · IIT Gandhinagar", year: "2025", description: "Secured 25th place in the written quiz competition at the 16th edition of Amalthea. Received a Certificate of Participation." },
+  { id: "olympai", title: "OlympAI", result: "Stage 2 cleared", context: "LegalOne · Binary Bandits", description: "Team Binary Bandits cleared Stage 2 with the Botpress AI legal-information chatbot project." },
+  { id: "sih", title: "Smart India Hackathon", result: "College-level qualified", context: "Meghdoot AI · Among the top 90 teams", description: "Qualified through the college-level round during the first year of B.Tech with the flood-detection team project." },
+  { id: "laserhacks", title: "LaserHacks", result: "Finalist — Top 7 Teams", context: "Lasell University, USA · UnfairSphere · November 15–16, 2025", year: "2025", description: "Reached the finals of LaserHacks as part of one of seven finalist teams. Although we did not win, our team successfully competed in the final round." },
 ] as const;
 
 export const experiments = [

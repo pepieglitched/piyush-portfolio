@@ -13,8 +13,22 @@
 .panelTop { @include mono; display: flex; justify-content: space-between; gap: 1rem; font-size: .49rem; color: $graphite; }
 .level { @include mono; display: flex; gap: .55rem; align-items: center; font-size: .52rem; line-height: 1.7; color: $graphite; i { width: 5px; height: 5px; background: $red; flex: none; } }
 .description { font-size: .83rem; line-height: 1.8; color: $graphite; margin-top: 1.4rem; max-width: 38rem; }
-.items { list-style: none; padding: 0; margin: 2rem 0 0; display: grid; grid-template-columns: 1fr 1fr; column-gap: 1.7rem; li { border-bottom: 1px solid $line; padding: 1rem 0; font-size: .86rem; display: flex; gap: .85rem; align-items: baseline; line-height: 1.6; min-width: 0; > span:last-child { overflow-wrap: anywhere; } } }
-.itemIndex { font-family: var(--font-mono); font-size: .47rem; color: $red-text; flex: none; }
+.items { list-style: none; padding: 0; margin: 2rem 0 0; display: grid; grid-template-columns: 1fr 1fr; column-gap: 1.7rem; li { border-bottom: 1px solid $line; padding: 1rem 0; font-size: .86rem; display: flex; gap: .75rem; align-items: flex-start; line-height: 1.6; min-width: 0; > span:last-child { overflow-wrap: anywhere; } } }
+.skillMark {
+  width: 1.5rem;
+  height: 1.5rem;
+  flex: 0 0 1.5rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid $line;
+  background: rgba($ink, .025);
+  color: $graphite;
+}
+.skillIcon { display: block; width: 1.0625rem; height: 1.0625rem; object-fit: contain; }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .skillIcon { transition: transform .26s ease; }
+  .items li:hover .skillIcon { transform: translateY(-1px) scale(1.1); }
+}
 .footer { border-top: 1px solid $line; padding-top: 1.5rem; margin-top: 2.5rem; display: flex; gap: 2rem; justify-content: space-between; align-items: center; > p { font-size: .85rem; line-height: 1.5; color: $graphite; em { font-size: 1.6rem; color: $ink; } } a { font-size: .78rem; } }
 .noScript { margin-top: 3rem; border-top: 1px solid $line; padding-top: 2rem; h3 { font-size: 2rem; letter-spacing: -.05em; } h4 { font-weight: 500; font-size: 1rem; margin: 2rem 0 .8rem; } p, li { font-size: .85rem; line-height: 1.8; color: $graphite; } }
 @media (max-width: 1000px) { .explorer { gap: 5%; grid-template-columns: .85fr 1.15fr; } .items { grid-template-columns: 1fr; } .panel { min-height: 680px; } .scramble { font-size: .7rem; } }

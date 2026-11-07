@@ -27,3 +27,30 @@ The existing project already had six case studies, a spatial mind scene, Signal 
 4. For a separate Vercel deployment, follow [README.md](README.md), set the real site origin, and build to `out/`.
 
 The original source archive remains in outputs. The V3 source archive is a separate deliverable.
+
+# Portfolio Iteration V4
+
+## Stage 1 — audited
+
+- Opened the existing owner-private Site checkout at V3 commit 242ea62. Preserving the editorial identity, chapter structure, original hero, game, and project pages.
+- Reviewed the 12-second animation reference. It uses stepped typography, thin technical guides, and reveals that run in layers. V4 adapts these on paper and ink.
+- Brainwiz and LaserHacks have matching PDFs. The third supplied PDF is a separate course completion. OlympAI and Smart India Hackathon previews remain inactive until matching evidence is supplied.
+- Identified a stale WebP portrait URL in the home JSON-LD. V4 will use the existing alpha AVIF.
+- Next: migrate scroll ownership to Locomotive, refine the glass nav, implement two real certificate previews and the LaserHacks correction, tune the hero and chapter motion, and add the portrait and skill marks.
+
+## Stage 2 — implemented
+
+- The existing glass nav gained greater translucency and direction-aware GSAP motion. One Locomotive Scroll instance moves the native window and updates ScrollTrigger on the shared ticker. Touch and reduced motion retain native scrolling.
+- Evidence keeps four rows. Brainwiz and LaserHacks have matching, optimized previews, accessible dialogs, and keyboard and touch support. The other two rows have no preview control. LaserHacks now says Finalist — Top 7 Teams.
+- The original hero sits higher and fits a shorter laptop composition. The new portrait is a closing portrait stamp with a masked GSAP reveal and AVIF variants.
+- Skill rows keep their original names and show verified brand SVGs or neutral marks. No experience data was added.
+- The video inspired layered hero guides, line draws, a stronger Signal Run entrance, project guide marks, and staggered academic and skill animations.
+- Next: validate production, correct any layout or interaction regressions, measure Lighthouse, and update the same private Site.
+
+
+## Stage 3 — verified
+
+- Production build, lint, and TypeScript passed. The 29 integration and seven lifecycle checks passed with zero runtime errors. Four axe scans found zero violations.
+- Lighthouse performance scored 94 on mobile and 100 on desktop. Mobile LCP measured 2.97 seconds. See docs/VERIFICATION.md and docs/reports/v4 for all metrics.
+- Brainwiz and LaserHacks are active. OlympAI and Smart India Hackathon remain inactive pending matching assets.
+- The existing owner-private Site is the V4 release target. For release provenance or later updates, reuse the existing Site ID and query the current live version. Do not run a second scroll engine beside Locomotive.

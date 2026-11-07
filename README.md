@@ -32,7 +32,7 @@ npm run preview
 
 `npm run preview` serves `out/` at `http://localhost:3000`. Stop the development server before starting a preview on the same port. The application uses `output: 'export'`; use the static preview or `npm start` rather than `next start` for this output.
 
-Portraits use `next/image` with a custom loader selecting pre-optimized 640, 828, 1080, and 1600-pixel variants (AVIF with alpha for the V3 hero). This supports static hosting without a runtime image server. If portrait sources change, inspect `scripts/optimize-assets.mjs` and regenerate all expected variants before building. For the hero cutout and its responsive variants alone, run `npm run assets -- --portrait-only`. The saved alpha mask is combined with the unaltered source RGB channels.
+Portraits use `next/image` with a custom loader selecting pre-optimized 640, 828, 1080, and 1600-pixel variants (AVIF with alpha for the hero). This supports static hosting without a runtime image server. If portrait sources change, inspect `scripts/optimize-assets.mjs` and regenerate all expected variants before building. For the hero cutout and its responsive variants alone, run `npm run assets -- --portrait-only`. The saved alpha mask is combined with the unaltered source RGB channels. Run `npm run assets -- --closing-only` for the closing portrait’s three AVIF sizes.
 
 ## Deploy to Vercel
 
@@ -51,7 +51,7 @@ piyush-portfolio/
 ├── src/
 │   ├── app/                   # Server-rendered App Router pages and metadata
 │   ├── components/
-│   │   ├── chapters/          # Education timeline and Skill Set
+│   │   ├── chapters/          # Education, Skill Set, and Evidence
 │   │   ├── motion/            # Scoped GSAP chapter drivers
 │   │   ├── portrait/          # Interactive alpha-masked ASCII portrait
 │   │   ├── game/              # Lazy Signal Run canvas game
@@ -61,6 +61,8 @@ piyush-portfolio/
 │   └── styles/                # SCSS tokens and global styles
 ├── public/
 │   ├── images/                # Optimized supplied portraits and original graphics
+│   ├── certificates/          # Verified certificate previews and detail images
+│   ├── icons/skills/          # Self-hosted skill marks and licenses
 │   ├── about.md
 │   ├── education.md
 │   ├── projects.md
@@ -80,7 +82,7 @@ piyush-portfolio/
 
 ## Motion and accessibility
 
-Scoped GSAP timelines handle chapter entrances, parallax and the desktop Education pin. The engine loads on visitor intent, while HTML and imagery paint immediately. Lenis follows the GSAP ticker. CSS handles the floating glass bar, Motion animates the mobile menu, Anime.js handles decorative glyphs, and React Three Fiber runs the optional spatial shader. The portrait draws its alpha-clipped glyph field only during interaction. The game has a separate canvas loop while playing.
+Scoped GSAP timelines handle chapter entrances, parallax and the desktop Education pin. The engine loads on visitor intent, while HTML and imagery paint immediately. Locomotive Scroll v5 owns fine-pointer smoothing on the native window and follows GSAP’s ticker. GSAP also slides the glass header on scroll direction. Motion animates the mobile menu, Anime.js handles decorative glyphs, and React Three Fiber runs the optional spatial shader. The portrait draws its alpha-clipped glyph field only during interaction. The game has a separate canvas loop while playing.
 
 Touch devices retain native momentum scrolling; reduced-motion preferences retain visible content and native scrolling. Anchors, browser history, focus indicators, keyboard navigation, and game Skip remain available. WebGL is an enhancement, and essential content is rendered in HTML. The game begins only after Start and can be paused or skipped.
 
@@ -88,7 +90,7 @@ Touch devices retain native momentum scrolling; reduced-motion preferences retai
 
 The supplied master dossier covers the original chapters. The uploaded Education and Technical Skills document is the source for those two V3 chapters and their text resources. Unconfirmed school and programme wording, academic dates, and the conflicting Class 12 percentage are omitted. See `docs/V3-CONTENT-AUDIT.md` for decisions. The finalized theme controls the visual direction. Built projects, prototypes, proposed architecture, and learning are labelled separately. The playable game is a portfolio feature, not a historical competition project.
 
-No professional email, verified project-specific repositories, current live demos, project screenshots, prototype photos, or certificate image files were supplied. GitHub and LinkedIn use the exact supplied public URLs. There are no fabricated demos, employment claims, hardware outcomes, or historical performance scores. See `docs/CONTENT-AUDIT.md` for the full mapping and missing evidence.
+Brainwiz and LaserHacks show their matching supplied participation certificates. OlympAI and Smart India Hackathon have no matching assets yet. See `docs/V4-EVIDENCE-AUDIT.md`. A professional email, verified project-specific repositories, live demos, project screenshots, and prototype photos are still unavailable. GitHub and LinkedIn use the exact supplied public URLs. There are no fabricated demos, employment claims, hardware outcomes, or historical performance scores. See `docs/CONTENT-AUDIT.md` for the full mapping and missing evidence.
 
 Performance and accessibility scores must be measured against the production output. The implementation targets fast first paint, stable layout, bounded GPU work, lazy heavy features, and accessible interaction; this README does not claim a Lighthouse or accessibility score without an executed audit.
 

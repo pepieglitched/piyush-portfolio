@@ -18,7 +18,7 @@ The dossier is a supplied source record, not independent verification of every u
 | Dossier Project 7 | Smart Calendar and `/projects/smart-calendar/` | Hardware/circuit exploration. Classroom integration remains planned. |
 | Dossier Project 6 | Robot and `/projects/autonomous-robot/` | Proposed two-board architecture. No completed autonomous test or award claimed. |
 | Dossier Projects 9 and 11 | Academic/laboratory exploration and public text | Clearly academic or exploratory; no invented deliverables or deployed products. |
-| Dossier §5 | Evidence chapter | BRAINWIZ 25th; OlympAI Stage 2; SIH college round/top 90; LaserHacks participation with ideation only. |
+| Dossier §5 and V4 request | Evidence chapter | BRAINWIZ 25th; OlympAI Stage 2; SIH college round/top 90; LaserHacks Top 7 finalist as clarified by Piyush. The LaserHacks certificate records participation. |
 | Dossier §6 | Skill groups | Distinguishes project experience, learning, and exploration; no invented percentages. |
 | Dossier §7 | Personal interests and reflective copy | AI, robotics, practical building, football, basketball. |
 | Finalized theme §1 | Contact and structured data | Exact supplied GitHub and LinkedIn URLs. No guessed email. |
@@ -31,7 +31,7 @@ Content is centralized in `src/content/portfolio.ts`. Public Markdown/text resou
 
 - No professional email was provided. Contact uses the two supplied public profiles.
 - No verified project-specific repository URLs or current demo URLs were provided. There are no fake Live Demo or Source links.
-- No project screenshots, prototype photographs, wiring diagrams, source code, or certificate images were found among the supplied portrait files and reference-image collection. The dossier refers to certificates from prior conversations, but that does not supply the actual image files here.
+- No project screenshots, prototype photographs, wiring diagrams, or project source code were found in the reference collection. V4 supplies Brainwiz and LaserHacks certificates. See [the Evidence audit](V4-EVIDENCE-AUDIT.md) for the matched files and remaining gaps.
 - Tridix's model inventory, interactions, current hosting, and version-specific performance evidence are absent.
 - LegalOne's personal role, team roster, implemented flows, and current working-demo scope are absent.
 - Meghdoot AI's detector method, data sources, technical stack, individual role, and SIH team name are absent.

@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, useState, type KeyboardEvent } from 'react';
 import { skillGroups } from '@/content/portfolio';
+import { SkillMark } from './SkillMark';
 import styles from './SkillSetChapter.module.scss';
 
 type ScrambleRun = { pause: () => unknown };
@@ -107,7 +108,14 @@ export default function SkillSetChapter() {
               <h3 data-skill-title>{group.title}<span aria-hidden="true">.</span></h3>
               <p className={styles.level}><i aria-hidden="true" />{group.level}</p>
               <p className={styles.description}>{group.introduction}</p>
-              <ul className={styles.items} data-skill-list>{group.items.map((item, itemIndex) => <li key={item} data-skill-item><span className={styles.itemIndex} aria-hidden="true">{String(itemIndex + 1).padStart(2, '0')}</span><span>{item}</span></li>)}</ul>
+              <ul className={styles.items} data-skill-list>
+                {group.items.map(item => (
+                  <li key={item} data-skill-item>
+                    <SkillMark item={item} group={group.id} />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           ))}
         </div>

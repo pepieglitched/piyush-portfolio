@@ -3,6 +3,18 @@ import { mkdir } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 const root = fileURLToPath(new URL('../', import.meta.url));
 await mkdir(`${root}public/images`, { recursive: true });
+if (!process.argv.includes('--portrait-only')) {
+  for (const size of [256, 512, 768]) {
+    await sharp(`${root}assets/source/closing-portrait.png`)
+      .resize({ width: size, withoutEnlargement: true })
+      .avif({ quality: 48, effort: 5 })
+      .toFile(`${root}public/images/closing-portrait-${size}.avif`);
+  }
+  if (process.argv.includes('--closing-only')) {
+    console.log('Created three responsive closing portrait variants.');
+    process.exit(0);
+  }
+}
 // The extraction tool supplies only the silhouette matte. Every visible RGB pixel
 // comes from Piyush's original photograph, preserving his exact real appearance.
 const matte = await sharp(`${root}assets/source/hero-alpha-mask.png`).extractChannel(0).raw().toBuffer();

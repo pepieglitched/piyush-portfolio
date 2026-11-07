@@ -326,7 +326,7 @@ export default function InteractivePortrait() {
   }, []);
 
   return <div ref={rootRef} className={styles.portrait} data-portrait-state={engaged ? 'code' : 'photo'} data-portrait-full={full ? 'true' : 'false'}>
-    <Image ref={imageRef} className={styles.image} src="/images/hero-transparent.png" alt="Piyush Rajput wearing sunglasses and a black shirt, in an original black-and-white halftone portrait" width={1145} height={1374} sizes="(max-width:700px) 95vw, 57vw" priority fetchPriority="high"/>
+    <Image ref={imageRef} className={styles.image} src="/images/hero-transparent.png" alt="Piyush Rajput wearing sunglasses and a black shirt, in an original black-and-white halftone portrait" width={1145} height={1374} sizes="(max-width:460px) 88vw, (max-width:700px) 408px, 52vw" priority fetchPriority="high"/>
     <canvas ref={canvasRef} className={styles.canvas} data-portrait-canvas aria-hidden="true"/>
     <button ref={buttonRef} className={styles.toggle} type="button" aria-label="Explore portrait as code" aria-pressed={full} disabled={unavailable}><span aria-hidden="true">&lt;/&gt;</span>{full ? 'RETURN TO PORTRAIT' : 'EXPLORE AS CODE'}<span aria-hidden="true">{full ? '−' : '+'}</span></button>
     <span className="sr-only" role="status">{unavailable ? 'The original portrait is displayed.' : full ? 'Portrait shown as a static code illustration. Press again to return to the photograph.' : 'Move over the portrait to reveal code, or use the Explore portrait as code button.'}</span>

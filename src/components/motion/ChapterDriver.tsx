@@ -56,17 +56,11 @@ export default function ChapterDriver({kind, scope}: Props) {
         case 'hero': {
           const lines = q<HTMLElement>('[data-hero-line]');
           const portrait = section.querySelector<HTMLElement>('[data-hero-portrait]');
-          const note = section.querySelector<HTMLElement>('[data-hero-note]');
-          if (section.getBoundingClientRect().bottom > 150) {
-            const entrance = gsap.timeline({defaults});
-            entrance.addLabel('boot').from(lines, {yPercent: 75, clipPath: 'inset(0 0 100% 0)', stagger: .13, duration: 1.15}, 'boot');
-            if (note) entrance.from(note, {x: -35}, 'boot+=.4');
-            if (portrait && !portrait.matches(':hover')) entrance.from(portrait, {y: 45, clipPath: 'inset(12% 0 0 16%)', duration: 1.35}, 'boot+=.2');
-          }
+          // The CSS entrance starts with server-rendered content. GSAP owns the scroll exit.
           if (desktop) {
             const departure = gsap.timeline({scrollTrigger: {trigger: section, start: 'top top', end: 'bottom top', scrub: .75}});
             departure.addLabel('into-the-mind').to(lines, {xPercent: -5, stagger: .04, ease: 'none'}, 'into-the-mind');
-            if (portrait) departure.to(portrait, {yPercent: 10, ease: 'none'}, 'into-the-mind');
+            if (portrait) departure.to(portrait, {yPercent: -6, ease: 'none'}, 'into-the-mind');
           }
           break;
         }
@@ -89,6 +83,8 @@ export default function ChapterDriver({kind, scope}: Props) {
           items.forEach(item => {
             const entry = gsap.timeline({defaults, scrollTrigger: {trigger: item, start: 'top 84%', toggleActions: 'play none none reverse'}});
             entry.addLabel('milestone').from(item, {x: desktop ? 65 : 22, clipPath: 'inset(0 0 0 100%)', duration: 1.05}, 'milestone');
+            const marker = item.querySelector('[data-education-marker]');
+            if (marker) entry.from(marker, {scale: .35, duration: .65, ease: 'back.out(1.7)'}, 'milestone+=.24');
             const subjects = item.querySelectorAll('[data-education-subject]');
             if (subjects.length) entry.from(subjects, {y: 22, stagger: .07}, 'milestone+=.3');
           });
@@ -103,11 +99,13 @@ export default function ChapterDriver({kind, scope}: Props) {
         case 'work': {
           q<HTMLElement>('[data-project-card]').forEach((card, index) => {
             const art = card.querySelector<HTMLElement>('[data-project-art]');
+            const guide = art?.querySelector('[data-art-guide]');
             const meta = card.querySelector<HTMLElement>('[data-project-meta]');
             const title = card.querySelector('h3');
             const entry = gsap.timeline({defaults, scrollTrigger: {trigger: card, start: 'top 86%', toggleActions: 'play none none reverse'}});
             entry.addLabel('project-unlocked');
             if (art) entry.from(art, {clipPath: `inset(${index ? '0 0 100%' : '100% 0 0'} 0)`, duration: 1.25}, 'project-unlocked');
+            if (guide) entry.from(guide, {scale: .88, opacity: 0, duration: .72}, 'project-unlocked+=.42');
             if (meta) entry.from(meta, {x: -25}, 'project-unlocked+=.35');
             if (title) entry.from(title, {y: 35, clipPath: 'inset(0 0 100% 0)'}, 'project-unlocked+=.45');
             if (desktop && art) gsap.fromTo(card, {y: index ? 25 : -10}, {y: index ? -35 : 20, ease: 'none', scrollTrigger: {trigger: card, start: 'top bottom', end: 'bottom top', scrub: .9}});
@@ -126,7 +124,13 @@ export default function ChapterDriver({kind, scope}: Props) {
         case 'game': {
           const signal = section.querySelector('[data-game-signal]');
           const exit = section.querySelector('[data-game-exit]');
-          if (signal) gsap.from(signal, {scaleX: .35, transformOrigin: 'center', duration: .8, ease: motionEase.sweep, scrollTrigger: {trigger: section, start: 'top 80%', toggleActions: 'play none none reverse'}});
+          const traces = q('[data-game-trace]');
+          if (signal) {
+            const entry = gsap.timeline({defaults, scrollTrigger: {trigger: signal, start: 'top 86%', toggleActions: 'play none none reverse'}});
+            entry.addLabel('incoming-signal')
+              .from(traces, {scaleX: 0, duration: .9, ease: motionEase.sweep}, 'incoming-signal')
+              .from(signal, {clipPath: 'inset(0 50% 0 50%)', y: 12}, 'incoming-signal+=.15');
+          }
           if (exit) gsap.from(exit, {y: 45, clipPath: 'inset(0 0 100% 0)', duration: 1.1, scrollTrigger: {trigger: exit, start: 'top 92%', toggleActions: 'play none none reverse'}});
           break;
         }
@@ -141,7 +145,8 @@ export default function ChapterDriver({kind, scope}: Props) {
             if (!panel) return;
             activeSkills = gsap.timeline({defaults: {duration: .6, ease: motionEase.editorial}});
             activeSkills.addLabel('new-vocabulary').from(panel.querySelectorAll('h3'), {y: 30, clipPath: 'inset(0 0 100% 0)'}, 'new-vocabulary')
-              .from(panel.querySelectorAll('[data-skill-item]'), {x: 22, stagger: .035}, 'new-vocabulary+=.1');
+              .from(panel.querySelectorAll('[data-skill-item]'), {x: 22, stagger: .035}, 'new-vocabulary+=.1')
+              .from(panel.querySelectorAll('[data-skill-mark]'), {scale: .6, rotation: -12, stagger: .035, duration: .5}, 'new-vocabulary+=.2');
             cancelAnimationFrame(refreshFrame);
             refreshFrame = requestAnimationFrame(() => ScrollTrigger.refresh());
           }) as () => void;
@@ -168,8 +173,13 @@ export default function ChapterDriver({kind, scope}: Props) {
         case 'contact': {
           const links = q<HTMLElement>('a').filter(link => !heading?.contains(link));
           if (links.length) gsap.from(links, {y: 30, stagger: .1, duration: .8, scrollTrigger: {trigger: section, start: 'top 65%', toggleActions: 'play none none reverse'}});
-          const stamp = section.querySelector('img');
-          if (stamp) gsap.from(stamp, {rotation: -12, scale: .7, duration: 1.1, ease: 'back.out(1.2)', scrollTrigger: {trigger: section, start: 'top 75%', toggleActions: 'play none none reverse'}});
+          const stamp = section.querySelector('[data-contact-stamp]');
+          const stampMask = stamp?.querySelector('[data-contact-mask]');
+          if (stamp && stampMask) {
+            const arrival = gsap.timeline({defaults, scrollTrigger: {trigger: stamp, start: 'top 83%', toggleActions: 'play none none reverse'}});
+            arrival.addLabel('portrait-stamp').from(stamp, {rotation: -11, scale: .86, y: 24, duration: 1.05}, 'portrait-stamp')
+              .from(stampMask, {clipPath: 'inset(0 0 100% 0)', duration: .82}, 'portrait-stamp+=.12');
+          }
           break;
         }
       }

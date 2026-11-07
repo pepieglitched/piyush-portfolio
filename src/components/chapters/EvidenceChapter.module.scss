@@ -1,0 +1,180 @@
+@use '../../styles/tokens' as *;
+
+.evidence {
+  @include section;
+  padding-top: 5rem;
+  border-top: 1px solid $line;
+}
+
+.intro {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin: 2.5rem 0 3rem;
+
+  > p {
+    color: $graphite;
+    font-size: .8rem;
+    line-height: 1.7;
+    padding-bottom: .4rem;
+  }
+}
+
+.milestones {
+  border-top: 1px solid $line;
+
+  article {
+    display: grid;
+    grid-template-columns: 70px minmax(0, 1fr) 240px;
+    gap: 1.25rem;
+    align-items: start;
+    border-bottom: 1px solid $line;
+    padding: 1.8rem 0;
+
+    h3 { font-size: 1.5rem; letter-spacing: -.045em; }
+    strong {
+      justify-self: end;
+      font-size: 1.1rem;
+      font-weight: 500;
+      letter-spacing: -.03em;
+    }
+  }
+}
+
+.number {
+  @include mono;
+  font-size: .55rem;
+  color: $red-text;
+  padding-top: .4rem;
+}
+
+.title > p {
+  margin-top: .6rem;
+  font: .55rem/1.6 var(--font-mono), monospace;
+  color: $graphite;
+}
+
+.detail {
+  grid-column: 2 / 4;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: .8rem 1.25rem;
+
+  > p {
+    max-width: 46rem;
+    font-size: .78rem;
+    line-height: 1.7;
+    color: $graphite;
+  }
+
+  > a {
+    @include mono;
+    display: inline-flex;
+    align-items: center;
+    gap: .65rem;
+    flex: none;
+    min-height: 44px;
+    margin-top: -.65rem;
+    border-bottom: 1px solid $line;
+    font-size: .55rem;
+    color: $ink;
+    transition: color .2s, border-color .2s;
+
+    span { transition: transform .2s; }
+    &:is(:hover, :focus-visible) { color: $red-text; border-color: currentColor; }
+    &:is(:hover, :focus-visible) span { transform: translate(.1rem, -.1rem); }
+  }
+}
+
+.note {
+  margin-top: 1rem;
+  color: $graphite;
+  font: .51rem/1.7 var(--font-mono), monospace;
+}
+
+.follower {
+  position: fixed;
+  z-index: 90;
+  top: 0;
+  left: 0;
+  visibility: hidden;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  border: 1px solid rgba($ink, .24);
+  background: $paper;
+  box-shadow: 0 12px 35px rgba($ink, .22);
+
+  img { display: block; width: 100%; height: auto; }
+}
+
+.dialog {
+  width: min(64rem, calc(100vw - 2rem));
+  max-width: none;
+  max-height: calc(100svh - 2rem);
+  padding: 0;
+  border: 1px solid $line;
+  background: $paper;
+  color: $ink;
+  overscroll-behavior: contain;
+  box-shadow: 0 18px 60px rgba($ink, .22);
+
+  &::backdrop { background: rgba($ink, .66); }
+}
+
+.dialogContent {
+  display: grid;
+  gap: .85rem;
+  padding: clamp(.8rem, 2vw, 1.4rem);
+
+  > img { max-width: 100%; width: auto; height: auto; max-height: 72svh; justify-self: center; object-fit: contain; }
+  > p { color: $graphite; text-align: center; font: .65rem/1.6 var(--font-mono), monospace; }
+}
+
+.dialogHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid $line;
+  padding-bottom: .65rem;
+
+  h2 { font-size: clamp(1rem, 2.4vw, 1.5rem); letter-spacing: -.035em; }
+  button {
+    flex: none;
+    min-width: 44px;
+    min-height: 44px;
+    border: 1px solid $line;
+    background: transparent;
+    color: $ink;
+    font-size: 1.25rem;
+
+    &:hover { border-color: $ink; }
+  }
+}
+
+:global(html):has(.dialog[open]) { overflow: hidden; scrollbar-gutter: stable; }
+
+@media (max-width: 1100px) {
+  .milestones article { grid-template-columns: 45px minmax(0, 1fr) 200px; }
+}
+
+@include mobile {
+  .evidence { padding: 4rem var(--gutter); }
+  .intro { display: block; margin: 1.5rem 0 2rem; > p { margin-top: 1.5rem; font-size: .75rem; } }
+  .milestones article {
+    grid-template-columns: 32px minmax(0, 1fr);
+    gap: 1rem;
+
+    h3 { font-size: 1.2rem; }
+    strong { grid-column: 2; justify-self: start; font-size: 1rem; }
+  }
+  .number, .note { font-size: .45rem; }
+  .detail {
+    grid-column: 2;
+    flex-direction: column;
+    > p { font-size: .72rem; }
+    > a { margin-top: -.1rem; }
+  }
+}

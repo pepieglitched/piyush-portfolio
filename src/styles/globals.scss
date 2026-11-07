@@ -1,5 +1,5 @@
 @use 'tokens' as *;
-@import 'lenis/dist/lenis.css';
+@import 'locomotive-scroll/locomotive-scroll.css';
 :root { --paper:#f3f0e8; --ink:#0b0c0f; --red:#ed3345; --gutter:clamp(1.25rem,4.5vw,5rem); }
 * { box-sizing:border-box; }
 html { scroll-behavior:auto; scroll-padding-top:7.5rem; }

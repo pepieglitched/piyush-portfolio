@@ -21,7 +21,7 @@ The opening system cue and chapters form one page:
 | 07 — Still Becoming | Supplied isolated sunglasses portrait with an upward wipe and reflection on continued learning. |
 | 08 — Open Connection | Verified GitHub and LinkedIn links. |
 
-The frontal halftone photograph anchors the hero. A separate alpha mask cuts it out while retaining the source RGB pixels. An intent-loaded Canvas 2D renderer samples alpha and luminance into a cached grid, erases a soft pointer region, and composites changing glyphs into the silhouette. The code toggle works with touch and keyboard and uses a static glyph frame under reduced motion. Page 7 uses the supplied isolated sunglasses portrait.
+The frontal halftone photograph anchors the hero. A separate alpha mask cuts it out while retaining the source RGB pixels. An intent-loaded Canvas 2D renderer samples alpha and luminance into a cached grid, erases a soft pointer region, and composites changing glyphs into the silhouette. The code toggle works with touch and keyboard and uses a static glyph frame under reduced motion. Page 7 uses the supplied isolated sunglasses portrait. A different supplied halftone image appears as the closing portrait stamp, with responsive AVIF variants.
 
 ## Application structure
 
@@ -34,7 +34,8 @@ Local fonts use `next/font`. Portrait variants are pre-optimized to responsive f
 | System | Exclusive responsibility | Lifecycle |
 | --- | --- | --- |
 | GSAP + ScrollTrigger | Chapter masks, project wipes, editorial parallax, Education progress and desktop pin | Scoped `useGSAP` contexts, labelled timelines, SplitText reversion, and responsive matchMedia cleanup. |
-| Lenis | Optional scroll smoothing | GSAP ticker supplies seconds × 1000; scroll updates notify ScrollTrigger; detach both on unmount. |
+| Locomotive Scroll 5.0.1 | Fine-pointer smoothing and anchor travel | Native window scroller, one engine, custom GSAP ticker, scroll callback to ScrollTrigger, and disposal on preference changes or unmount. |
+| GSAP interaction motion | Directional header slide and Evidence pointer following | Independent transforms and scoped cleanup. Certificate movement tracks the pointer without React state on each event. |
 | Motion for React | Lazily loaded mobile menu transition | React component lifecycle and reduced-motion settings. |
 | Anime.js | Decorative glyph pulse and Skill Set label scramble | Local elements only, cancel on cleanup. |
 | React Three Fiber + GLSL | Spatial mind illustration and shader uniforms | Dynamically loaded, bounded DPR, off-screen inactivity, disposed resources. |
@@ -48,19 +49,19 @@ No motion blocks first meaningful paint. Reduced-motion mode keeps content visib
 
 | Chapter | Motion |
 | --- | --- |
-| The Human | Masked line entrance, portrait sweep, and desktop scrubbed exit. |
+| The Human | CSS masked line entrance, portrait rise, technical guide lines, and GSAP desktop scrubbed exit. |
 | Inside the Mind | Orbital wipe, directional entrance, and parallax. |
 | Education | Staggered milestone wipes, scroll-linked timeline, and a single pinned sidebar on large screens. |
-| Selected Work | Opposing artwork wipes, card parallax, and staggered archive rows. |
-| Signal Run | Signal expands on entry and the continuation link wipes into view. |
-| Skill Set | Category stagger, animated panel heading and items, and a decorative label scramble. |
-| The Evidence | Alternating directional row movement and animated separators. |
+| Selected Work | Opposing artwork wipes, layered guide lines, card parallax, and staggered archive rows. |
+| Signal Run | Flanking guide lines draw in, the signal badge opens, and the continuation link wipes into view. |
+| Skill Set | Category stagger, animated panel heading and brand marks, and a decorative label scramble. |
+| The Evidence | Alternating directional row movement, animated separators, and verified cursor-following previews. |
 | Still Becoming | An upward sunglasses portrait wipe with scrubbed scale and position. |
-| Open Connection | Masked words, stamp rotation, and staggered links. |
+| Open Connection | Masked words, stamp rotation and wipe, and staggered links. |
 
 ## Interaction and responsive behavior
 
-The floating navbar uses CSS backdrop blur, a pointer-tracked reflection, and a magnetic contact action. The wordmark is Piyush’s name. Active chapter indicators follow scroll, and a lazy Motion panel provides keyboard-accessible links on small screens. Desktop uses oversized typography, asymmetric grids, framed photography, and restrained depth. Smaller screens recompose the layout into readable vertical sections with appropriate portrait crops and large controls. Nothing requires hover to discover essential information.
+The floating navbar uses CSS backdrop blur, a pointer-tracked reflection, and a magnetic contact action. The wordmark is Piyush’s name. Active chapter indicators follow scroll. The sticky bar retreats on deliberate downward movement and returns on upward movement or keyboard focus. A lazy Motion panel provides keyboard-accessible links on small screens. Desktop uses oversized typography, asymmetric grids, framed photography, and restrained depth. Smaller screens recompose the layout into readable vertical sections with appropriate portrait crops and large controls. Nothing requires hover to discover essential information.
 
 Signal Run is an original short robot game: collect AI, Software, and Robotics cores while avoiding bugs. It begins only after Start. Arrow keys/A–D move; jump keys and touch controls are explicit in the interface. Pause, Restart, and Skip remain available. The lazy game shell reserves its height so the later anchors remain stable. Game keys prevent page scroll only while gameplay has focus. Blur or pause releases control to the document. Sound is opt-in and muted by default.
 
@@ -74,6 +75,6 @@ The hero image has explicit dimensions and loading priority. Heavy WebGL and gam
 
 ## Startup budget refinements
 
-GSAP/Lenis load on the first visitor interaction; Motion loads when the mobile menu opens. WebGL probing waits until the mind chapter is near the viewport. The static orbital fallback remains visible until the GPU confirms its first draw. Offscreen chapters use CSS content visibility, while all text remains in the server HTML. Grain uses a tiny static SVG rather than a full-screen turbulence filter. Public Markdown resources regenerate from the central content module before every build. Small red text uses a darker accessible derivative of Signal Red.
+GSAP and Locomotive load on the first visitor interaction; Motion loads when the mobile menu opens. WebGL probing waits until the mind chapter is near the viewport. The static orbital fallback remains visible until the GPU confirms its first draw. Offscreen chapters use CSS content visibility, while all text remains in the server HTML. Grain uses a tiny static SVG rather than a full-screen turbulence filter. Public Markdown resources regenerate from the central content module before every build. Small red text uses a darker accessible derivative of Signal Red.
 
-Native chapter anchors preserve browser hash and history behavior. Fine-pointer links use Lenis when active and retain the navbar offset and keyboard focus. Native CSS smooth scrolling is disabled to avoid a competing scroll clock. Fine-pointer devices use Lenis; coarse-pointer touch devices keep browser momentum scrolling. Focus, target hashes, or first visitor intent resolve skipped chapter layout before navigation or GSAP measurement.
+Native chapter anchors preserve browser hash and history behavior. Fine-pointer links use Locomotive when active and retain the navbar offset and keyboard focus. Native CSS smooth scrolling is disabled to avoid a competing scroll clock. Coarse-pointer touch devices keep browser momentum scrolling. Focus, target hashes, or first visitor intent resolve skipped chapter layout before navigation or GSAP measurement.

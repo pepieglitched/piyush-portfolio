@@ -22,13 +22,13 @@ let browser;
 try {
   browser = await chromium.launch({ channel: 'chrome', headless: true });
 
-  await check('Global animation listeners stay stable across client routes; reduced motion reverts transforms and Lenis', async () => {
+  await check('Global animation listeners stay stable across client routes; reduced motion reverts transforms and Locomotive Scroll', async () => {
     const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, reducedMotion: 'no-preference' });
     await context.addInitScript(() => {
       // Observe native registrations without changing listener identity or behavior.
       const add = EventTarget.prototype.addEventListener;
       const remove = EventTarget.prototype.removeEventListener;
-      const watched = new Set(['scroll', 'wheel', 'touchstart', 'touchmove', 'touchend', 'click', 'keydown', 'popstate', 'hashchange', 'change', 'portfolio:skills-change']);
+      const watched = new Set(['scroll', 'wheel', 'touchstart', 'touchmove', 'touchend', 'click', 'keydown', 'popstate', 'hashchange', 'change', 'portfolio:skills-change', 'portfolio:anchor-travel']);
       const records = [];
       const capture = options => typeof options === 'boolean' ? options : Boolean(options?.capture);
       const label = target => target === window ? 'window' : target === document ? 'document' : typeof MediaQueryList !== 'undefined' && target instanceof MediaQueryList ? `media:${target.media}` : null;
@@ -71,7 +71,7 @@ try {
     try {
       await page.goto(base, { waitUntil: 'networkidle' });
       await page.mouse.move(120, 120); // The production animation engine intentionally loads on visitor intent.
-      await page.waitForFunction(() => document.documentElement.classList.contains('lenis'));
+      await page.waitForFunction(() => document.documentElement.dataset.scrollEngine === 'locomotive');
       await page.evaluate(() => {
         if (!window.gsap) return; // Production ESM builds do not generally expose module internals.
         const ticker = window.gsap.ticker;
@@ -115,13 +115,14 @@ try {
             readyChapters: document.querySelectorAll('[data-motion-ready="true"]').length,
             pinSpacers: document.querySelectorAll('.pin-spacer').length,
             nestedPinSpacers: document.querySelectorAll('.pin-spacer .pin-spacer').length,
-            lenisActive: document.documentElement.classList.contains('lenis'),
+            locomotiveActive: document.documentElement.dataset.scrollEngine === 'locomotive',
             trackedTickerCallbacks: window.__ownedTickerCount?.() ?? null,
             listeners: window.__listenerSnapshot(),
           };
         }, label);
       };
       const observations = [await snapshot('initial-home')];
+      assert.match(await page.evaluate(() => window.locomotiveScrollVersion), /^5\./);
       report.observations.lifecycle = observations;
       if (observations[0].triggers === null) report.skipped.push({ check: 'Direct ScrollTrigger count / ticker callback count', reason: 'Production ESM bundle does not expose GSAP module internals. Observable native listener registrations, live animation targets, and transform reversion are verified instead.' });
       const homes = [];
@@ -134,8 +135,8 @@ try {
         assert.equal(project.pinSpacers, 0, 'Home chapter pins must not outlive navigation to a case study');
         assert.equal(project.readyChapters, 0);
         if (project.triggers !== null) { assert.equal(project.staleTriggers, 0); }
-        if (project.trackedTickerCallbacks !== null) assert.equal(project.trackedTickerCallbacks, 1, 'Exactly one app Lenis callback must be registered');
-        assert.equal(project.lenisActive, true);
+        if (project.trackedTickerCallbacks !== null) assert.equal(project.trackedTickerCallbacks, 1, 'Exactly one app Locomotive callback must be registered');
+        assert.equal(project.locomotiveActive, true);
         await page.getByRole('link', { name: 'Home', exact: true }).click();
         await page.waitForURL(url => url.pathname === '/');
         await page.locator('#human').waitFor();
@@ -143,7 +144,7 @@ try {
         homes.push(home); observations.push(home);
         if (home.triggers !== null) { assert.equal(home.staleTriggers, 0); }
         if (home.trackedTickerCallbacks !== null) assert.equal(home.trackedTickerCallbacks, 1);
-        assert.equal(home.lenisActive, true);
+        assert.equal(home.locomotiveActive, true);
         assert.equal(await page.evaluate(() => window.__lifecycleDocument), identity, 'Next links should retain the same document');
       }
       assert.equal(new Set(homes.map(item => item.pinSpacers)).size, 1, 'Pin spacers must not accumulate through client routes');
@@ -160,7 +161,7 @@ try {
       if (reduced.triggers !== null) assert.equal(reduced.triggers, 0);
       if (reduced.trackedTickerCallbacks !== null) assert.equal(reduced.trackedTickerCallbacks, 0);
       assert.equal(reduced.inlineTransforms, 0, 'GSAP must revert every owned inline transform for reduced motion');
-      assert.equal(reduced.lenisActive, false);
+      assert.equal(reduced.locomotiveActive, false);
       assert.equal(reduced.pinSpacers, 0, 'Reduced motion must remove pinned layout wrappers');
       assert.equal(reduced.readyChapters, 0, 'Reduced motion must unmount chapter drivers');
       const registrations = item => Object.values(item.listeners).reduce((sum,count)=>sum+count,0);
@@ -171,7 +172,7 @@ try {
       await page.emulateMedia({ reducedMotion: 'no-preference' });
       const restored = await snapshot('restored-motion'); observations.push(restored);
       if (restored.trackedTickerCallbacks !== null) assert.equal(restored.trackedTickerCallbacks, 1);
-      assert.equal(restored.lenisActive, true);
+      assert.equal(restored.locomotiveActive, true);
       if (restored.triggers !== null) { assert.equal(restored.staleTriggers, 0); assert.equal(restored.triggers, homes[0].triggers); }
       assert.equal(restored.pinSpacers, homes[0].pinSpacers);
       assert.equal(restored.readyChapters, homes[0].readyChapters);
@@ -213,27 +214,98 @@ try {
     } finally {await context.close();}
   });
 
-  await check('Desktop chapter anchors settle below the floating navigation', async () => {
+  await check('Glass navbar responds to wheel direction without jitter and reveals for keyboard focus', async () => {
+    const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: 'no-preference' });
+    const page = watchPage(await context.newPage());
+    const header = page.locator('body > header');
+    const navHidden = hidden => page.waitForFunction(hidden => {
+      const bar = document.querySelector('body > header');
+      const bottom = bar.getBoundingClientRect().bottom;
+      return bar.dataset.navHidden === String(hidden) && (hidden ? bottom <= 0 : bottom >= 65);
+    }, hidden);
+    const settle = () => page.waitForFunction(() => !document.documentElement.classList.contains('lenis-smooth'));
+    try {
+      await page.goto(base, { waitUntil: 'networkidle' });
+      await page.mouse.move(5, 5);
+      await page.waitForFunction(() => document.documentElement.dataset.scrollEngine === 'locomotive' && document.querySelector('body > header').dataset.navMotion === 'true');
+      await navHidden(false);
+      const surface = await page.getByRole('navigation', { name: 'Main navigation' }).evaluate(nav => {
+        const style = getComputedStyle(nav);
+        return { color: style.backgroundColor, blur: style.backdropFilter, radius: parseFloat(style.borderRadius) };
+      });
+      const alpha = Number(surface.color.match(/^rgba\(.+,\s*([\d.]+)\)$/)?.[1]);
+      assert.ok(alpha > .5 && alpha < .82, `Glass must let the backdrop through: ${surface.color}`);
+      assert.match(surface.blur, /blur\(.+\).*saturate\(.+\)/);
+      assert.ok(surface.radius >= 16);
+
+      await page.mouse.wheel(0, 620);
+      await navHidden(true);
+      await settle();
+      const beforeJitter = await page.evaluate(() => scrollY);
+      await page.mouse.wheel(0, -6);
+      await page.waitForFunction(y => scrollY < y, beforeJitter);
+      await settle();
+      await navHidden(true);
+      await page.mouse.wheel(0, -100);
+      await navHidden(false);
+      await settle();
+
+      await page.mouse.wheel(0, 160);
+      await navHidden(true);
+      await page.keyboard.press('Tab'); // Skip link.
+      await page.keyboard.press('Tab'); // First header link.
+      assert.equal(await header.evaluate(bar => bar.contains(document.activeElement)), true);
+      await navHidden(false);
+      await page.keyboard.press('Shift+Tab');
+      await page.keyboard.press('Home');
+      await page.waitForFunction(() => scrollY <= 1);
+      await navHidden(false);
+
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await page.waitForFunction(() => !document.documentElement.dataset.scrollEngine && !document.querySelector('body > header').dataset.navMotion);
+      await page.mouse.wheel(0, 240);
+      await navHidden(true);
+      assert.equal(await header.evaluate(bar => bar.style.transform), '', 'Reduced motion uses a static state without an animation tween');
+      await page.mouse.wheel(0, -240);
+      await navHidden(false);
+      report.observations.navigation = { surface, navHysteresis: true, keyboardReveal: true, reducedMotionWithoutTween: true };
+    } finally { await context.close(); }
+  });
+
+  await check('Locomotive chapter anchors clear the visible header and preserve browser history and deep links', async () => {
     const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
     const page = watchPage(await context.newPage());
     const measurements = [];
     report.observations.anchors = measurements;
     try {
       await page.goto(base, { waitUntil: 'networkidle' });
+      await page.mouse.move(5, 5);
+      await page.waitForFunction(() => document.documentElement.dataset.scrollEngine === 'locomotive');
+      const landing = id => page.waitForFunction(id => {
+        const top = document.getElementById(id).getBoundingClientRect().top;
+        const headerBottom = document.querySelector('body > header').getBoundingClientRect().bottom;
+        const atEnd = Math.abs(scrollY + innerHeight - document.documentElement.scrollHeight) < 3;
+        const gliding = document.documentElement.classList.contains('lenis-smooth');
+        return !gliding && headerBottom >= 65 && top >= headerBottom - 3 && (top <= headerBottom + 80 || (atEnd && top < innerHeight));
+      }, id, { timeout: 6000 });
       for (const [href, id] of [['/#mind','mind'], ['/#education','education'], ['/#skills','skills'], ['/#work','work'], ['/#signal-run','signal-run'], ['/#contact','contact']]) {
         await page.locator(`header a[href="${href}"]`).click();
         await page.waitForURL(url => url.hash === `#${id}`);
-        await page.waitForFunction(id => {
-          const top = document.getElementById(id).getBoundingClientRect().top;
-          const headerBottom = document.querySelector('body > header').getBoundingClientRect().bottom;
-          const atEnd = Math.abs(scrollY + innerHeight - document.documentElement.scrollHeight) < 3;
-          const gliding = document.documentElement.classList.contains('lenis-scrolling');
-          return !gliding && top >= headerBottom - 3 && (top <= headerBottom + 80 || (atEnd && top < innerHeight));
-        }, id, { timeout: 6000 });
+        await landing(id);
         const measurement = await page.locator(`#${id}`).evaluate(element => ({ id: element.id, top: element.getBoundingClientRect().top, headerBottom: document.querySelector('body > header').getBoundingClientRect().bottom, atDocumentEnd: Math.abs(scrollY + innerHeight - document.documentElement.scrollHeight) < 3 }));
         measurements.push(measurement);
         assert.ok(measurement.top >= measurement.headerBottom - 3 && (measurement.top <= measurement.headerBottom + 80 || (measurement.atDocumentEnd && measurement.top < 1000)), `#${id} must land below the sticky header or at document end: ${JSON.stringify(measurement)}`);
       }
+      await page.goBack();
+      await page.waitForURL(url => url.hash === '#signal-run');
+      await landing('signal-run');
+      await page.goForward();
+      await page.waitForURL(url => url.hash === '#contact');
+      await landing('contact');
+      await page.reload({ waitUntil: 'networkidle' });
+      await page.waitForURL(url => url.hash === '#contact');
+      await landing('contact');
+      report.observations.anchorHistory = { back: '#signal-run', forward: '#contact', reload: '#contact' };
     } finally { await context.close(); }
   });
 
@@ -287,12 +359,12 @@ try {
         const bottom=document.querySelector('body > header').getBoundingClientRect().bottom;return top >= bottom - 3 && top <= bottom + 80;
       }, undefined, { timeout: 6000 });
       const workTop = await page.locator('#work').evaluate(element => element.getBoundingClientRect().top);
-      const nativeTouch = await page.evaluate(() => ({ coarsePointer: matchMedia('(pointer: coarse)').matches, lenisActive: document.documentElement.classList.contains('lenis') }));
+      const nativeTouch = await page.evaluate(() => ({ coarsePointer: matchMedia('(pointer: coarse)').matches, locomotiveActive: document.documentElement.dataset.scrollEngine === 'locomotive' }));
       report.observations.mobileMenu = { navigationMilliseconds: Date.now() - navigationStarted, hash: new URL(page.url()).hash, workTop, ...nativeTouch };
       const headerBottom=await page.locator('body > header').evaluate(element=>element.getBoundingClientRect().bottom);
       assert.ok(workTop >= headerBottom - 3 && workTop <= headerBottom + 80, `Mobile #work must clear the glass navigation: ${workTop}`);
       assert.equal(nativeTouch.coarsePointer, true);
-      assert.equal(nativeTouch.lenisActive, false, 'Touch devices should use native momentum scrolling');
+      assert.equal(nativeTouch.locomotiveActive, false, 'Touch devices should use native momentum scrolling');
       await page.locator('#signal-run').scrollIntoViewIfNeeded();
       const start = page.getByRole('button', { name: 'PRESS START →', exact: true });
       await start.waitFor();
