@@ -2,8 +2,8 @@
 
 import { useEffect, useId, useRef, type RefObject } from 'react';
 
-const RIM_DEPTH = 14;
-const FILTER_SCALE = 24;
+const RIM_DEPTH = 13;
+const FILTER_SCALE = 23;
 
 function makeDisplacementMap(width: number, height: number, radius: number) {
   const resolution = Math.min(1, 1024 / width, 128 / height);

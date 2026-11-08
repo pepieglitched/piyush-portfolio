@@ -5,11 +5,11 @@ import styles from './play.module.scss';
 
 export const metadata: Metadata = {
   title: 'Signal Run',
-  description: 'Play Signal Run, an original portfolio game by Piyush Rajput. Collect three energy cores in arcade or turn-based mode.',
+  description: 'Play Signal Run, an original endless runner by Piyush Rajput. Jump over Error Bots and platform gaps as the pace picks up.',
   alternates: { canonical: '/play/' },
   openGraph: {
     title: 'Signal Run — Piyush Rajput',
-    description: 'A tiny robot. Three energy cores. A few bugs along the way.',
+    description: 'A tiny robot, an endless track, and a leaderboard to climb.',
     url: '/play/',
   },
 };
@@ -26,7 +26,7 @@ export default function PlayPage() {
             <p className={styles.kicker}><i aria-hidden="true" /> THE BUILDER’S MIND / SIDE QUEST</p>
             <h1>Signal <span className="serif">Run.</span></h1>
           </div>
-          <p>A tiny robot, three energy cores, and a few bugs to jump over. Pick arcade mode or take it one turn at a time.</p>
+          <p>A tiny robot on an endless track. Jump over Error Bots and platform gaps, then see how your score stacks up.</p>
         </header>
         <section id="signal-run" aria-label="Signal Run arcade">
           <GameChapter />

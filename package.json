@@ -6,11 +6,13 @@
     "dev": "next dev --hostname 0.0.0.0",
     "prebuild": "node scripts/generate-resources.mjs",
     "build": "next build --webpack",
+    "postbuild": "node scripts/build-worker.mjs",
     "start": "serve out -l 3000",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "assets": "node scripts/optimize-assets.mjs",
-    "preview": "serve out -l 3000"
+    "preview": "serve out -l 3000",
+    "preview:leaderboard": "node scripts/preview-leaderboard.mjs"
   },
   "dependencies": {
     "next": "^16.0.0",
@@ -37,7 +39,9 @@
     "serve": "^14.2.0",
     "@axe-core/playwright": "^4.10.0",
     "@playwright/test": "^1.56.0",
-    "lighthouse": "^13.0.0"
+    "lighthouse": "^13.0.0",
+    "esbuild": "^0.28.2",
+    "serve-handler": "6.1.7"
   },
   "overrides": { "compression": "^1.8.2", "@typescript-eslint/typescript-estree": { "minimatch": "^11.0.5" } }
 }

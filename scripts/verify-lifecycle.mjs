@@ -344,7 +344,7 @@ try {
     } finally { await context.close(); }
   });
 
-  await check('Mobile game overlay stays inside its stage and first touch press moves then releases the robot', async () => {
+  await check('Mobile game overlay fits and a touch jumps while the field advances', async () => {
     const context = await browser.newContext({ viewport: { width: 390, height: 1000 }, deviceScaleFactor: 1, isMobile: true, hasTouch: true });
     const page = watchPage(await context.newPage());
     try {
@@ -378,27 +378,27 @@ try {
       assert.ok(headingBox.y >= stageBox.y && startBox.y + startBox.height <= stageBox.y + stageBox.height, 'Idle game content must be contained by its stage');
       await page.locator('#signal-run').screenshot({ path: 'test-results/mobile-game-contained.png' });
       await start.tap();
-      const right = page.getByRole('button', { name: 'Move right', exact: true });
-      await right.scrollIntoViewIfNeeded();
-      await stage.focus();
-      await page.waitForTimeout(200);
+      await page.waitForFunction(() => document.querySelector('[data-runner-phase]')?.dataset.runnerPhase === 'running');
       const canvas = page.locator('#signal-run canvas');
       const initial = digest(await canvas.evaluate(canvas => canvas.toDataURL()));
-      const point = await right.boundingBox(); assert.ok(point);
-      const session = await context.newCDPSession(page);
-      await session.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: point.x + point.width / 2, y: point.y + point.height / 2, radiusX: 4, radiusY: 4, force: 1, id: 1 }] });
-      await page.waitForTimeout(650);
-      const moving = digest(await canvas.evaluate(canvas => canvas.toDataURL()));
-      await session.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-      assert.notEqual(moving, initial, 'The first touch press must change the game world pixels');
-      await page.waitForTimeout(100);
-      const released = digest(await canvas.evaluate(canvas => canvas.toDataURL()));
-      await page.waitForTimeout(250);
-      assert.equal(digest(await canvas.evaluate(canvas => canvas.toDataURL())), released, 'Robot movement must stop after touch release');
+      await stage.tap({ position: { x: stageBox.width / 2, y: stageBox.height / 2 } });
+      const antenna = await page.waitForFunction(() => {
+        const canvas = document.querySelector('#signal-run canvas');
+        if (!canvas) return false;
+        const scale = canvas.height / 400;
+        const x = Math.round(scale * Math.min(110, Math.round(canvas.width / scale * .23)));
+        const height = Math.floor(scale * 250);
+        const strip = canvas.getContext('2d').getImageData(x, 0, 1, height).data;
+        for (let i = 0; i < strip.length; i += 4) {
+          if (strip[i] === 237 && strip[i + 1] === 51 && strip[i + 2] === 69) return i / 4;
+        }
+        return false;
+      });
+      assert.ok(await antenna.jsonValue(), 'The robot antenna rises above the grounded sprite after a tap');
+      assert.notEqual(digest(await canvas.evaluate(canvas => canvas.toDataURL())), initial, 'Canvas redraws as the game advances');
       await stage.press('Escape');
       await page.getByRole('heading', { name: 'PAUSED.', exact: true }).waitFor();
-      report.observations.mobileTouch = { stageHeight: stageBox.height, movedOnFirstPress: true, stoppedAfterRelease: true };
-      await session.detach();
+      report.observations.mobileTouch = { stageHeight: stageBox.height, jumpOnFirstTap: true };
     } finally { await context.close(); }
   });
 

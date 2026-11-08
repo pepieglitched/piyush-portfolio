@@ -2,17 +2,17 @@
 
 $glass-ink: var(--glass-ink, #141618);
 $glass-solid: var(--glass-solid, #f4f0e7);
-$glass-grade: var(--glass-grade, saturate(1.23) contrast(.58) brightness(1.1));
-$glass-frost: blur(5px) $glass-grade;
-$glass-lens: blur(1.4px) $glass-grade;
+$glass-grade: var(--glass-grade, saturate(1.32) contrast(.49) brightness(1.26));
+$glass-frost: blur(6px) $glass-grade;
+$glass-lens: blur(2.4px) $glass-grade;
 $glass-spring: cubic-bezier(.18, 1.35, .45, 1);
 
 @mixin raised-glass {
   border: 1px solid var(--glass-button-border, rgba(255, 255, 255, .66));
   color: $glass-ink;
   background:
-    radial-gradient(ellipse at 18% 0%, var(--glass-button-shine, rgba(255, 255, 255, .64)), transparent 70%),
-    linear-gradient(150deg, var(--glass-button-light, rgba(255, 255, 255, .32)), var(--glass-button-dark, rgba(249, 243, 230, .16)));
+    radial-gradient(ellipse at 18% 0%, var(--glass-button-shine, rgba(255, 255, 255, .52)), transparent 70%),
+    linear-gradient(150deg, var(--glass-button-light, rgba(255, 255, 255, .28)), var(--glass-button-dark, rgba(249, 243, 230, .12)));
   box-shadow: 0 2px 6px rgba(25, 29, 35, .15),
     inset 0 1px 1px var(--glass-button-edge, rgba(255, 255, 255, .86)),
     inset 0 -2px 3px rgba(45, 35, 28, .09);
@@ -43,9 +43,9 @@ $glass-spring: cubic-bezier(.18, 1.35, .45, 1);
   margin-inline: auto;
   padding: 10px 12px 10px 24px;
   color: $glass-ink;
-  border: 1px solid rgba(96, 84, 69, .19);
+  border: 1px solid rgba(96, 84, 69, .17);
   border-radius: 23px;
-  box-shadow: 0 1px 3px rgba(28, 23, 18, .12), 0 12px 32px rgba(25, 21, 17, .14);
+  box-shadow: 0 1px 3px rgba(28, 23, 18, .10), 0 10px 28px rgba(25, 21, 17, .12);
   pointer-events: auto;
   // The specular sheen sits above the optical surface and below the links.
   &::after {
@@ -56,7 +56,7 @@ $glass-spring: cubic-bezier(.18, 1.35, .45, 1);
     border-radius: inherit;
     opacity: var(--reflection);
     background: radial-gradient(ellipse 180px 64px at var(--shine-x) var(--shine-y),
-      rgba(255, 255, 255, .55), rgba(255, 248, 231, .17) 48%, transparent 78%);
+      rgba(255, 255, 255, .44), rgba(255, 248, 231, .12) 48%, transparent 78%);
     transition: opacity .38s ease-out;
     pointer-events: none;
   }
@@ -69,13 +69,13 @@ $glass-spring: cubic-bezier(.18, 1.35, .45, 1);
   inset: -1px;
   border-radius: inherit;
   pointer-events: none;
-  background: var(--glass-tint, rgba(251, 248, 239, .42));
+  background: var(--glass-tint, rgba(251, 248, 239, .29));
   -webkit-backdrop-filter: $glass-frost;
   backdrop-filter: $glass-frost;
   // Stacked inner reflections give the bevel depth, even without pixel displacement.
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, .83),
-    inset 0 4px 5px -3px rgba(255, 255, 255, .85),
+    inset 0 1px 0 rgba(255, 255, 255, .74),
+    inset 0 4px 5px -3px rgba(255, 255, 255, .72),
     inset 0 -2px 4px rgba(59, 43, 30, .12),
     inset 2px 0 4px -2px rgba(255, 240, 216, .6),
     inset -2px 0 4px -2px rgba(218, 237, 255, .7);
@@ -95,8 +95,8 @@ $glass-spring: cubic-bezier(.18, 1.35, .45, 1);
     padding: 1.5px;
     border-radius: inherit;
     pointer-events: none;
-    background: linear-gradient(126deg, #fff 1%, rgba(255, 255, 255, .47) 25%,
-      rgba(123, 103, 84, .13) 52%, rgba(255, 255, 255, .57) 81%, rgba(255, 255, 255, .9) 100%);
+    background: linear-gradient(126deg, rgba(255, 255, 255, .93) 1%, rgba(255, 255, 255, .38) 25%,
+      rgba(123, 103, 84, .11) 52%, rgba(255, 255, 255, .49) 81%, rgba(255, 255, 255, .83) 100%);
     mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     mask-composite: exclude;
   }
@@ -214,7 +214,7 @@ $glass-spring: cubic-bezier(.18, 1.35, .45, 1);
   padding: .75rem 1.2rem 1.2rem;
   border: 1px solid rgba(255, 255, 255, .8);
   border-radius: 22px;
-  background: rgba(249, 246, 236, .88);
+  background: var(--glass-menu-tint, rgba(249, 246, 236, .78));
   box-shadow: 0 14px 36px rgba(25, 21, 17, .18), inset 0 1px 0 rgba(255, 255, 255, .79);
   -webkit-backdrop-filter: $glass-frost;
   backdrop-filter: $glass-frost;
@@ -252,15 +252,16 @@ $glass-spring: cubic-bezier(.18, 1.35, .45, 1);
   .nav {
     --glass-ink: #eef5ff;
     --glass-solid: #101c30;
-    --glass-grade: saturate(1.25) contrast(.78) brightness(.65);
-    --glass-tint: rgba(7, 15, 29, .60);
+    --glass-grade: saturate(1.28) contrast(.88) brightness(.63);
+    --glass-tint: rgba(7, 18, 37, .29);
+    --glass-menu-tint: rgba(10, 20, 35, .78);
     --glass-button-border: rgba(136, 182, 255, .4);
     --glass-button-shine: rgba(110, 163, 255, .24);
-    --glass-button-light: rgba(64, 114, 198, .35);
-    --glass-button-dark: rgba(17, 33, 57, .75);
+    --glass-button-light: rgba(64, 114, 198, .27);
+    --glass-button-dark: rgba(17, 33, 57, .52);
     --glass-button-edge: rgba(168, 201, 255, .35);
-    border-color: rgba(137, 179, 250, .32);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, .42);
+    border-color: rgba(137, 179, 250, .27);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, .33);
 
     &::before {
       background: linear-gradient(126deg, #b7d6ff, rgba(112, 165, 255, .22) 28%,
@@ -268,7 +269,7 @@ $glass-spring: cubic-bezier(.18, 1.35, .45, 1);
     }
     &::after {
       background: radial-gradient(ellipse 180px 64px at var(--shine-x) var(--shine-y),
-        rgba(123, 178, 255, .25), rgba(60, 118, 222, .13) 48%, transparent 78%);
+        rgba(123, 178, 255, .20), rgba(60, 118, 222, .10) 48%, transparent 78%);
     }
   }
   .glassSurface {
@@ -278,7 +279,7 @@ $glass-spring: cubic-bezier(.18, 1.35, .45, 1);
       inset 2px 0 4px -2px rgba(137, 184, 255, .4);
   }
   .navLink {
-    background-image: radial-gradient(ellipse at 45% 10%, rgba(126, 173, 250, .24), rgba(37, 74, 134, .12) 65%, transparent);
+    background-image: radial-gradient(ellipse at 45% 10%, rgba(126, 173, 250, .17), rgba(37, 74, 134, .09) 65%, transparent);
     &:is(:hover, :focus-visible, [aria-current='location']) { box-shadow: inset 0 1px 0 rgba(131, 181, 255, .45); }
     &::after { background: $red-text; }
   }
@@ -288,7 +289,6 @@ $glass-spring: cubic-bezier(.18, 1.35, .45, 1);
   }
   .mobile {
     border-color: rgba(139, 183, 255, .4);
-    background: rgba(10, 20, 35, .95);
     box-shadow: 0 14px 36px rgba(0, 0, 0, .45), inset 0 1px 0 rgba(142, 185, 255, .34);
     a {
       border-bottom-color: $line;

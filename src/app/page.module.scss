@@ -66,7 +66,14 @@
 @keyframes guide-draw { from { transform:var(--guide-start); } }
 @keyframes annotation-in { from { opacity:0; translate:-.5rem 0; } }
 
-.player{pointer-events:none;position:absolute;bottom:18%;right:7%;display:flex;gap:.7rem;align-items:center;@include mono;font-size:.5rem;background:$paper;padding:.6rem .8rem;border:1px solid $line;z-index:2;transform:rotate(-4deg);i{height:4px;width:4px;background:$red;} }
+.player {
+  position:absolute;bottom:18%;right:7%;display:flex;gap:.7rem;align-items:center;
+  min-height:44px;@include mono;font-size:.5rem;background:$paper;color:$ink;
+  padding:.6rem .8rem;border:1px solid $line;z-index:2;transform:rotate(-4deg);
+  transition:transform .2s ease,border-color .2s ease;
+  i{height:4px;width:4px;background:$red;}
+  &:hover{transform:rotate(-2deg) translateY(-2px);border-color:$red;}
+}
 .heroMargin {position:absolute;right:0;top:22%;z-index:2;writing-mode:vertical-rl;display:flex;gap:2rem;@include mono;font-size:.45rem;}
 .start{position:absolute;bottom:2rem;left:0;display:flex;align-items:center;gap:1rem;z-index:3;>span:last-child{font-family:var(--font-pixel),monospace;font-size:.5rem;line-height:2.2;b{font-family:var(--font-mono);font-size:.58rem;font-weight:400;text-transform:uppercase;}} &:hover .startBox{background:$red;border-color:$red;color:var(--band-text);transform:translateY(3px);} }
 .startBox{width:42px;height:42px;display:grid;place-items:center;background:var(--band-bg);color:var(--band-text);font-size:1.4rem;transition:background .2s,transform .2s;}
@@ -177,10 +184,14 @@
   top:-2.65rem;
   rotate:7deg;
   padding:6px;
+  border:0;
   background:$paper;
   outline:1px solid $ink;
   box-shadow:5px 5px 0 tint($ink,.12);
-  pointer-events:none;
+  cursor:pointer;
+  touch-action:manipulation;
+  &:hover { box-shadow:5px 5px 0 tint($ink,.24); }
+  &:focus-visible { outline:2px solid $red-text; outline-offset:4px; }
 }
 .contactPortraitMask {
   display:block;

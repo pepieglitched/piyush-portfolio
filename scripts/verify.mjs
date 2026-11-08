@@ -147,7 +147,7 @@ try {
   assert.ok(glass.radius>=16,'The navigation must retain its rounded glass geometry');
   assert.equal(await nav.locator('a[href="/#signal-run"]').count(),0);
   assert.equal(await page.locator('#signal-run').count(),0);
-  report.observations.navigation=glass;check('Floating navigation keeps five chapter links and the home page leaves the arcade undisclosed');
+  report.observations.navigation=glass;check('Floating navigation keeps five chapter links and the game stays on its own route');
 
   const education=await page.locator('#education').textContent();
   assert.match(education,/Karnavati University/);assert.match(education,/Artificial Intelligence and Machine Learning/);assert.match(education,/First year/);assert.match(education,/Science stream/);
@@ -201,18 +201,57 @@ try {
   await page.locator('#education').screenshot({path:'test-results/education.png'});await page.locator('#skills').screenshot({path:'test-results/skills.png'});await page.locator('#work').screenshot({path:'test-results/work.png'});
   await verifyEvidence(page);
 
+  const player = page.getByRole('button',{name:/PLAYER_01.*PIYUSH RAJPUT/});
+  await player.press('Enter');
+  const invitation = page.getByRole('dialog',{name:'Want to play a game?'});
+  await expect(invitation).toBeVisible();
+  await expect(invitation.getByRole('link',{name:/YES, LET’S PLAY|YES, LET'S PLAY/})).toHaveAttribute('href','/play/');
+  await page.keyboard.press('Escape');
+  await expect(invitation).toBeHidden();
+  await expect(player).toBeFocused();
+  check('PLAYER_01 opens the shared invitation and receives focus again on dismissal');
+
+  const portraitChoice = page.getByRole('button',{name:'Choose your pill',exact:true});
+  await portraitChoice.press('Enter');
+  const choice = page.locator('dialog[data-pill-choice]');
+  await expect(choice).toBeVisible();
+  await choice.getByRole('button',{name:/Blue pill/i}).click();
+  await expect(choice.getByRole('status')).toHaveText('You missed the opportunity.');
+  await choice.getByRole('button',{name:/Return to the portfolio/}).click();
+  await expect(choice).toBeHidden();
+  await expect(portraitChoice).toBeFocused();
+  check('The portrait choice provides blue-pill feedback and restores keyboard focus');
+
   await page.goto(base+'/play/',{waitUntil:'networkidle'});
   await page.getByRole('link',{name:'Back to Portfolio',exact:true}).waitFor();
   await page.locator('#signal-run').scrollIntoViewIfNeeded();await page.getByRole('combobox',{name:'PLAY STYLE'}).waitFor();
-  await page.getByRole('combobox',{name:'PLAY STYLE'}).selectOption('turns');await page.getByRole('button',{name:'PRESS START →',exact:true}).click();
-  for(let i=0;i<3;i++){await page.getByRole('button',{name:'JUMP FORWARD ↑',exact:true}).click();await page.getByRole('button',{name:'MOVE FORWARD →',exact:true}).click();}
-  await page.getByRole('heading',{name:/MISSION COMPLETE/}).waitFor();
-  assert.match(await page.locator('#signal-run').getByRole('status').innerText(),/Curious Mind/);check('Accessible game completes all three cores');
+  const score = page.locator('[data-runner-score]');
+  const start = page.getByRole('button',{name:'PRESS START →',exact:true});
+  await page.getByRole('combobox',{name:'PLAY STYLE'}).selectOption('steps');await start.click();
+  await page.getByRole('button',{name:'JUMP FORWARD ↑',exact:true}).click();
+  await expect.poll(async()=>Number(await score.textContent())).toBeGreaterThan(0);
+  await expect(page.getByText('STEP PRACTICE / UNRANKED',{exact:false})).toBeVisible();
+  check('Step practice supports accessible, unranked commands on the endless track');
   await page.locator('#signal-run').screenshot({path:'test-results/game.png'});
-  await page.getByRole('combobox',{name:'PLAY STYLE'}).selectOption('arcade');await page.getByRole('button',{name:'PRESS START →',exact:true}).click();
-  const stage=page.getByRole('application',{name:'Signal Run play area'});await stage.focus();await page.keyboard.down('ArrowRight');await page.waitForTimeout(600);await page.keyboard.up('ArrowRight');await page.keyboard.press('Escape');
-  await page.getByRole('heading',{name:'PAUSED.'}).waitFor();check('Arcade keyboard movement and Escape pause');await auditAccessibility(page,'game-paused');
-  await page.getByRole('link',{name:'SKIP ↗',exact:true}).click();await page.waitForURL('**/#skills');check('Game skip continues to the Skill Set chapter using native navigation');
+  await page.getByRole('combobox',{name:'PLAY STYLE'}).selectOption('arcade');await start.click();
+  const stage=page.getByRole('application',{name:'Signal Run play area'});
+  await expect(stage).toHaveAttribute('data-runner-phase','running');
+  await expect.poll(async()=>Number(await score.textContent())).toBeGreaterThan(0);
+  await stage.press('Space');await stage.press('Escape');
+  await page.getByRole('heading',{name:'PAUSED.'}).waitFor();
+  check('Arcade moves and scores automatically and supports keyboard jump and Escape pause');
+  await auditAccessibility(page,'game-paused');
+  await stage.getByRole('button',{name:'RESUME →'}).click();
+  await page.getByRole('heading',{name:'GAME OVER.'}).waitFor();
+  await expect(stage.getByText(/^FINAL SCORE/)).toBeVisible();
+  await stage.getByRole('button',{name:'POST MY SCORE'}).click();
+  const scoreDialog = page.getByRole('dialog',{name:'Want to put your name on the leaderboard?'});
+  await expect(scoreDialog).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(scoreDialog).toBeHidden();
+  await stage.getByRole('link',{name:'EXIT GAME'}).click();
+  await page.waitForURL(url=>url.pathname==='/' && !url.hash);
+  check('Error Bot collision shows the final score, score prompt, and exit route');
 
   for(const slug of ['tridix','legalone','meghdoot-ai','brts','smart-calendar','autonomous-robot']){
     const response=await page.goto(`${base}/projects/${slug}/`,{waitUntil:'networkidle'});assert.equal(response.status(),200);assert.equal(await page.locator('h1').count(),1);

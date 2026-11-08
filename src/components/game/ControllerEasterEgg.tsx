@@ -3,7 +3,8 @@
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useRef, useState, type KeyboardEvent, type MouseEvent } from 'react';
+import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type MouseEvent } from 'react';
+import { lockPage } from '@/lib/page-lock';
 import { findControllerSpot, type ControllerSpot } from './controller-position';
 import styles from './ControllerEasterEgg.module.scss';
 
@@ -11,21 +12,20 @@ const GameInviteMotion = dynamic(() => import('./GameInviteMotion'), { ssr: fals
 const sticker = '/controller-sticker.webp';
 const between = (min: number, max: number) => min + Math.random() * (max - min);
 const controls = 'a[href], button, input, select, textarea, [contenteditable]:not([contenteditable="false"]), [role="application"]';
+const inviteEvent = 'portfolio:game-invite';
 
-function lockPage(): (restorePosition: boolean) => void {
-  const root = document.documentElement;
-  const { overflow, scrollbarGutter } = root.style;
-  const x = window.scrollX;
-  const y = window.scrollY;
-  if (window.innerWidth > root.clientWidth) root.style.scrollbarGutter = 'stable';
-  root.style.overflow = 'hidden';
-  return restorePosition => {
-    root.style.overflow = overflow;
-    root.style.scrollbarGutter = scrollbarGutter;
-    if (restorePosition && (window.scrollX !== x || window.scrollY !== y)) {
-      window.scrollTo({ left: x, top: y, behavior: 'instant' });
-    }
-  };
+export function PlayerInvite({ className }: { className: string }) {
+  return (
+    <button
+      type="button"
+      className={className}
+      aria-haspopup="dialog"
+      aria-controls="game-invite"
+      onClick={event => document.dispatchEvent(new CustomEvent(inviteEvent, { detail: event.currentTarget }))}
+    >
+      PLAYER_01 <i aria-hidden="true" /> PIYUSH RAJPUT
+    </button>
+  );
 }
 
 export default function ControllerEasterEgg() {
@@ -35,9 +35,23 @@ export default function ControllerEasterEgg() {
   const dialog = useRef<HTMLDialogElement>(null);
   const play = useRef<HTMLAnchorElement>(null);
   const cancel = useRef<HTMLButtonElement>(null);
+  const openedBy = useRef<HTMLButtonElement | null>(null);
   const unlock = useRef<((restorePosition: boolean) => void) | null>(null);
   const retireAfterInvite = useRef<(() => void) | null>(null);
   const leaving = useRef(false);
+
+  const showInvitation = useCallback((source: HTMLButtonElement) => {
+    if (!dialog.current || document.querySelector('dialog[open]')) return;
+    leaving.current = false;
+    openedBy.current = source;
+    unlock.current = lockPage();
+    dialog.current.showModal();
+    setOpen(true);
+  }, []);
+
+  useEffect(() => {
+    if (open) cancel.current?.focus({ preventScroll: true });
+  }, [open]);
 
   useEffect(() => {
     let timer: number | undefined;
@@ -87,6 +101,11 @@ export default function ControllerEasterEgg() {
           (event.type === 'pointerdown' && outside)) dismiss();
     };
     const checkRelease = () => { if (expired) schedule(settle, 0); };
+    const invitePlayer = (event: Event) => {
+      const source = (event as CustomEvent<HTMLButtonElement>).detail;
+      if (source instanceof HTMLButtonElement) showInvitation(source);
+    };
+    document.addEventListener(inviteEvent, invitePlayer);
     document.addEventListener('pointerdown', activity, { passive: true, capture: true });
     document.addEventListener('keydown', activity, true);
     document.addEventListener('focusout', checkRelease);
@@ -99,6 +118,7 @@ export default function ControllerEasterEgg() {
 
     return () => {
       window.clearTimeout(timer);
+      document.removeEventListener(inviteEvent, invitePlayer);
       document.removeEventListener('pointerdown', activity, true);
       document.removeEventListener('keydown', activity, true);
       document.removeEventListener('focusout', checkRelease);
@@ -110,24 +130,17 @@ export default function ControllerEasterEgg() {
       unlock.current?.(false);
       unlock.current = null;
     };
-  }, []);
-
-  function showInvitation() {
-    if (!dialog.current || document.querySelector('dialog[open]')) return;
-    unlock.current = lockPage();
-    dialog.current.showModal();
-    cancel.current?.focus({ preventScroll: true });
-    setOpen(true);
-  }
+  }, [showInvitation]);
 
   function closeInvitation() {
     setOpen(false);
     unlock.current?.(!leaving.current);
     unlock.current = null;
     if (!leaving.current) {
-      trigger.current?.focus({ preventScroll: true });
-      retireAfterInvite.current?.();
+      openedBy.current?.focus({ preventScroll: true });
+      if (openedBy.current === trigger.current) retireAfterInvite.current?.();
     }
+    openedBy.current = null;
   }
 
   function enterGame(event: MouseEvent<HTMLAnchorElement>) {
@@ -157,12 +170,13 @@ export default function ControllerEasterEgg() {
         className={styles.trigger}
         data-controller-discovery
         style={{ left: spot.x, top: spot.y, width: spot.size, height: spot.size }}
-        onClick={showInvitation}
+        onClick={event => showInvitation(event.currentTarget)}
       >
         <Image src={sticker} alt="" width={384} height={384} loading="eager" unoptimized />
       </button>}
       <dialog
         ref={dialog}
+        id="game-invite"
         data-game-invite
         data-lenis-prevent
         className={styles.invite}
@@ -171,18 +185,18 @@ export default function ControllerEasterEgg() {
         onClose={closeInvitation}
         onKeyDown={trapFocus}
       >
-        {spot && <div className={styles.panel}>
-          <div className={styles.eyebrow}><i aria-hidden="true" /> HIDDEN SIGNAL FOUND</div>
+        {(spot || open) && <div className={styles.panel}>
+          <div className={styles.eyebrow}><i aria-hidden="true" /> SIGNAL RUN / ARCADE</div>
           <Image className={styles.sticker} src={sticker} alt="" width={384} height={384} loading="eager" unoptimized />
           <h2 id="game-invite-title">Want to play <span className="serif">a game?</span></h2>
-          <p id="game-invite-description">Signal Run is ready. Collect three cores in arcade or turn-based mode.</p>
+          <p id="game-invite-description">Signal Run is ready. Jump over Error Bots and gaps, and see how far you can go.</p>
           <div className={styles.actions}>
             <Link ref={play} href="/play/" prefetch={false} className={styles.play} onClick={enterGame}>YES, LET&apos;S PLAY <span aria-hidden="true">↗</span></Link>
             <button ref={cancel} type="button" className={styles.cancel} onClick={() => dialog.current?.close()}>MAYBE LATER</button>
           </div>
         </div>}
       </dialog>
-      {spot && <GameInviteMotion trigger={trigger} dialog={dialog} open={open} />}
+      {(spot || open) && <GameInviteMotion trigger={trigger} dialog={dialog} open={open} />}
     </>
   );
 }

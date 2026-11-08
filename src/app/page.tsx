@@ -3,12 +3,13 @@ import Link from 'next/link';
 import { profile, projects } from '@/content/portfolio';
 import { siteUrl } from '@/lib/site';
 import InteractivePortrait from '@/components/portrait/InteractivePortrait';
+import ContactPortrait from '@/components/portrait/ContactPortrait';
 import EducationChapter from '@/components/chapters/EducationChapter';
 import SkillSetChapter from '@/components/chapters/SkillSetChapter';
 import { EvidenceChapter } from '@/components/chapters/EvidenceChapter';
 import ProjectArtwork from '@/components/ProjectArtwork';
 import MindExplorer from '@/components/spatial/MindExplorer';
-import ControllerEasterEgg from '@/components/game/ControllerEasterEgg';
+import ControllerEasterEgg, { PlayerInvite } from '@/components/game/ControllerEasterEgg';
 import PortfolioBoot from '@/components/PortfolioBoot';
 import MotionChapter from '@/components/motion/MotionChapter';
 import styles from './page.module.scss';
@@ -32,7 +33,7 @@ export default function Home() {
         <div className={styles.heroPortrait} data-hero-portrait>
           <div className={styles.heroImageLayer}><InteractivePortrait/></div>
           <div className={styles.scanCorner} aria-hidden="true"><span/><span/></div>
-          <span className={styles.player}>PLAYER_01 <i/> PIYUSH RAJPUT</span>
+          <PlayerInvite className={styles.player} />
         </div>
         <div className={styles.heroMargin}><span>CURIOUS BY DEFAULT.</span><span>ALWAYS IN PROGRESS.</span></div>
         <a href="#mind" className={styles.start}><span className={styles.startBox}>↓</span><span>PRESS START<br/><b>to explore the mind</b></span></a>
@@ -77,7 +78,7 @@ export default function Home() {
 
     <MotionChapter kind="becoming"><section id="becoming" className={styles.becoming} aria-labelledby="becoming-title"><div className={styles.quietPortrait} data-portrait-reveal><Image data-parallax src="/images/cutout.png" alt="Piyush Rajput wearing bold sunglasses in his original black-and-white halftone portrait" width={1274} height={1235} sizes="(max-width:700px) 90vw, 42vw"/><span>THE HUMAN BEHIND THE BUILDS.</span></div><div className={styles.becomingCopy}><p className="chapter-label"><b>06</b> STILL BECOMING</p><h2 id="becoming-title" data-reveal>STILL LEARNING.<br/>STILL <span className="serif">building.</span></h2><p>I’m not at the end of a journey. I’m at the part where every project opens another question.</p><p>I’m pursuing a B.Tech (Hons.) in Computer Science and Engineering, specializing in AI and Machine Learning at Karnavati University. I’m drawn to practical technology — especially the places where intelligent software meets the physical world.</p><div className={styles.personalNote}>More questions. More experiments.<br/><span className="serif">That’s the plan.</span></div></div></section></MotionChapter>
 
-    <MotionChapter kind="contact"><footer id="contact" className={styles.contact}><div className={styles.contactTop}><p className="chapter-label"><b>07</b> OPEN CONNECTION</p><span><i/> A CONVERSATION IS A GOOD START.</span></div><div className={styles.contactStage}><span className={styles.contactPortrait} data-contact-stamp><span className={styles.contactPortraitMask} data-contact-mask><Image src="/images/closing-portrait.png" alt="Piyush Rajput in a black-and-white halftone portrait with sunglasses and a light polo shirt" width={1086} height={1448} sizes="(max-width:700px) 72px, 166px"/></span></span><h2 data-reveal>LET’S BUILD<br/><span className="serif">something.</span><a href={profile.links.linkedin} target="_blank" rel="noopener noreferrer" aria-label="Connect with Piyush on LinkedIn"><span aria-hidden="true">↗</span></a></h2></div><div className={styles.contactBottom}><p>Have an idea, a question,<br/>or a shared curiosity? Let’s connect.</p><div><a href={profile.links.github} target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a><a href={profile.links.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn <span aria-hidden="true">↗</span></a></div><a href="#human" className={styles.backTop}>BACK TO TOP ↑</a></div><div className={styles.colophon}><span>© {new Date().getFullYear()} PIYUSH RAJPUT</span><span>FROM CURIOSITY TO CREATION.</span><Link href="/llms.txt">THE MACHINE-READABLE EDITION ↗</Link></div></footer></MotionChapter>
+    <MotionChapter kind="contact"><footer id="contact" className={styles.contact}><div className={styles.contactTop}><p className="chapter-label"><b>07</b> OPEN CONNECTION</p><span><i/> A CONVERSATION IS A GOOD START.</span></div><div className={styles.contactStage}><ContactPortrait className={styles.contactPortrait} maskClassName={styles.contactPortraitMask}/><h2 data-reveal>LET’S BUILD<br/><span className="serif">something.</span><a href={profile.links.linkedin} target="_blank" rel="noopener noreferrer" aria-label="Connect with Piyush on LinkedIn"><span aria-hidden="true">↗</span></a></h2></div><div className={styles.contactBottom}><p>Have an idea, a question,<br/>or a shared curiosity? Let’s connect.</p><div><a href={profile.links.github} target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a><a href={profile.links.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn <span aria-hidden="true">↗</span></a></div><a href="#human" className={styles.backTop}>BACK TO TOP ↑</a></div><div className={styles.colophon}><span>© {new Date().getFullYear()} PIYUSH RAJPUT</span><span>FROM CURIOSITY TO CREATION.</span><Link href="/llms.txt">THE MACHINE-READABLE EDITION ↗</Link></div></footer></MotionChapter>
     <ControllerEasterEgg/>
   </main>;
 }

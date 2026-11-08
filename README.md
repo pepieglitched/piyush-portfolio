@@ -30,7 +30,7 @@ npm run build
 npm run preview
 ```
 
-`npm run preview` serves `out/` at `http://localhost:3000`. Stop the development server before starting a preview on the same port. The application uses `output: 'export'`; use the static preview or `npm start` rather than `next start` for this output.
+`npm run preview` serves `out/` at `http://localhost:3000`. To preview both the static export and the leaderboard, run `npm run preview:leaderboard` on Node 24 and open `http://127.0.0.1:3000/play/`. This preview uses a separate local SQLite file in `.sites-runtime/`. Set `LEADERBOARD_PREVIEW_IN_MEMORY=1` for a disposable database. Stop the development server before starting a preview on the same port.
 
 Portraits use `next/image` with a custom loader selecting pre-optimized 640, 828, 1080, and 1600-pixel variants (AVIF with alpha for the hero). This supports static hosting without a runtime image server. If portrait sources change, inspect `scripts/optimize-assets.mjs` and regenerate all expected variants before building. For the hero cutout and its responsive variants alone, run `npm run assets -- --portrait-only`. The saved alpha mask is combined with the unaltered source RGB channels. Run `npm run assets -- --closing-only` for the closing portrait’s three AVIF sizes.
 
@@ -42,7 +42,13 @@ Portraits use `next/image` with a custom loader selecting pre-optimized 640, 828
 4. When adding or changing a production domain, update the variable and rebuild so canonical and sitemap URLs follow the domain.
 5. Verify the home page, all six `/projects/<slug>/` routes, `/robots.txt`, `/sitemap.xml`, `/llms.txt`, and `/llms-full.txt` on the deployed origin.
 
-No database, authentication service, email service, or private API key is required.
+The static export supports offline gameplay. The global leaderboard requires the accompanying Worker and database.
+
+## Leaderboard deployment
+
+The existing Sites deployment reads `.openai/hosting.json`, provisions the D1 binding `DB`, and applies the schema in `drizzle/`. The production build emits the Worker in `dist/server/` and the original static Next.js export in `dist/client/`. Configure a random `LEADERBOARD_SIGNING_KEY` of at least 32 bytes in the hosted runtime's secret store. Keep that value server-side.
+
+For separate hosting, deploy the two outputs on the same origin, route `/api/leaderboard*` to the Worker, bind a D1 database as `DB`, and apply the migration before accepting scores. Set `LEADERBOARD_ORIGIN` to the public origin if a reverse proxy rewrites the Worker request URL. Runs remain playable if the API is unavailable, and local personal bests stay on the device.
 
 ## Project layout
 
