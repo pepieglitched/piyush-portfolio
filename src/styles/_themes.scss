@@ -1,0 +1,53 @@
+@mixin palette {
+  :root {
+    color-scheme: light;
+    --paper: #f3f0e8;
+    --ink: #0b0c0f;
+    --graphite: #33343a;
+    --red: #ed3345;
+    --red-text: #bf2434;
+    --yellow: #f5d547;
+    --blue: #4568ff;
+    --line: rgba(11, 12, 15, .22);
+    --panel: #ebe7dd;
+    --band-bg: #0b0c0f;
+    --band-text: #f3f0e8;
+    --contact-bg: #ed3345;
+    --portrait-panel: #e5e1d7;
+    --on-accent: #0b0c0f;
+    --gutter: clamp(1.25rem, 4.5vw, 5rem);
+  }
+
+  :root[data-theme='cyber'] {
+    color-scheme: dark;
+    --paper: #080d17;
+    --ink: #eef5ff;
+    --graphite: #a9bdd7;
+    --red: #4187ff;
+    --red-text: #83b5ff;
+    --yellow: #a0dcff;
+    --blue: #83b5ff;
+    --line: rgba(130, 171, 238, .28);
+    --panel: #111d30;
+    --band-bg: #060a14;
+    --band-text: #eef5ff;
+    --contact-bg: #102a50;
+    --portrait-panel: #9dafc9;
+    --on-accent: #080d17;
+  }
+
+  [data-theme='cyber'] body {
+    background-image:
+      radial-gradient(ellipse 62rem 36rem at 92% 0, rgba(29, 93, 197, .22), transparent),
+      linear-gradient(rgba(132, 177, 255, .055) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(132, 177, 255, .055) 1px, transparent 1px);
+    background-size: auto, 42px 42px, 42px 42px;
+    background-repeat: no-repeat, repeat, repeat;
+  }
+
+  [data-theme='cyber'] body::after { opacity: .035; }
+
+  [data-theme='cyber'] .eyebrow::before {
+    box-shadow: 0 0 .8rem rgba(65, 135, 255, .7);
+  }
+}

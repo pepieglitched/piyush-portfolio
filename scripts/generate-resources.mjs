@@ -6,7 +6,7 @@ const source = new URL('../src/content/portfolio.ts', import.meta.url);
 const { outputText } = ts.transpileModule(await readFile(source, 'utf8'), {
   compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 },
 });
-const { profile, education, projects, skillGroups, achievements } = await import(
+const { profile, education, projects, skillGroups, achievements, feedbackCourse } = await import(
   `data:text/javascript;base64,${Buffer.from(outputText).toString('base64')}`
 );
 
@@ -37,9 +37,11 @@ const skills = '# Skills and areas of exploration\n\nExperience is presented in 
 
 const milestones = '## Competition milestones\n\n' + achievements.map(item => `### ${item.title} — ${item.result}\n\n${item.context}\n\n${item.description}\n`).join('\n');
 
-const overview = `# ${profile.name}\n\n> Computer Science and Engineering student at Karnavati University in Ahmedabad, specializing in AI/ML. Exploring AI, interactive software, browser-based 3D, robotics, and embedded systems.\n\nFrom curiosity to creation. This portfolio distinguishes built work, prototypes, proposed architecture, coursework, exploration, and current learning. Signal Run is an optional original portfolio interaction.\n\n## Public information\n\n- [Portfolio](/): The Builder's Mind, an editorial portfolio with a playable intermission.\n- [About](/about.md): Biography, verified education, interests, and public profiles.\n- [Education](/education.md): Academic stages, confirmed programme details, coursework, and interests.\n- [Projects](/projects.md): Accurate project records and development status.\n- [Skills](/skills.md): Hands-on experience distinguished from learning and exploration.\n- [Full public portfolio](/llms-full.txt): Detailed text representation.\n\n## Project resources\n\n${projects.map(project => `- [${project.title}](/projects/${project.slug}/): ${project.status}. ${project.summary}`).join('\n')}\n\n## Public profiles\n\n${publicProfiles}\n`;
+const overview = `# ${profile.name}\n\n> Computer Science and Engineering student at Karnavati University in Ahmedabad, specializing in AI/ML. Exploring AI, interactive software, browser-based 3D, robotics, and embedded systems.\n\nFrom curiosity to creation. This portfolio distinguishes built work, prototypes, proposed architecture, coursework, exploration, and current learning. Signal Run is an optional original portfolio interaction.\n\n## Public information\n\n- [Portfolio](/): The Builder's Mind, an editorial portfolio with an optional Cyber theme.\n- [Signal Run](/play/): A separate, optional game.\n- [About](/about.md): Biography, verified education, interests, and public profiles.\n- [Education](/education.md): Academic stages, confirmed programme details, coursework, and interests.\n- [Projects](/projects.md): Accurate project records and development status.\n- [Skills](/skills.md): Hands-on experience distinguished from learning and exploration.\n- [Full public portfolio](/llms-full.txt): Detailed text representation.\n\n## Project resources\n\n${projects.map(project => `- [${project.title}](/projects/${project.slug}/): ${project.status}. ${project.summary}`).join('\n')}\n\n## Public profiles\n\n${publicProfiles}\n`;
 
-const full = `${about}\n${nest(projectText)}\n${nest(skills)}\n${milestones}\n## Portfolio interaction\n\nSignal Run is an original playable feature of this portfolio, not a historical project or competition achievement. Essential project and contact information is never gated behind game completion.\n`;
+const learning = `## Continuing learning\n\n### ${feedbackCourse.title}\n\n${feedbackCourse.provider} · ${feedbackCourse.date}\n\n${feedbackCourse.description}\n\n[Certificate](/certificates/${feedbackCourse.id}.webp)\n`;
+
+const full = `${about}\n${nest(projectText)}\n${nest(skills)}\n${milestones}\n${learning}\n## Portfolio interaction\n\n[Signal Run](/play/) is an original game created for this portfolio. Essential project and contact information is never gated behind game completion.\n`;
 
 const resources = {
   'about.md': about,

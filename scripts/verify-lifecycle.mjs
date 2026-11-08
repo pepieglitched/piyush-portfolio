@@ -105,7 +105,7 @@ try {
         return page.evaluate(label => {
           const triggers = window.gsap?.core.globals().ScrollTrigger?.getAll();
           const targets = triggers?.map(trigger => trigger.trigger).filter(Boolean);
-          const ownedNodes = [...document.querySelectorAll('[data-reveal], [data-hero-line], [data-hero-note], [data-hero-portrait], [data-parallax], [data-draw], [data-motion-word], [data-education-aside], [data-education-item], [data-project-card], [data-project-art], [data-project-meta], [data-project-row], [data-project-number], [data-evidence-item], [data-skill-item], [data-portrait-reveal], [data-game-signal], [data-game-exit]')];
+          const ownedNodes = [...document.querySelectorAll('[data-reveal], [data-hero-line], [data-hero-note], [data-hero-portrait], [data-parallax], [data-draw], [data-motion-word], [data-education-aside], [data-education-item], [data-project-card], [data-project-art], [data-project-meta], [data-project-row], [data-project-row-copy], [data-project-row-rule], [data-project-number], [data-evidence-item], [data-skill-item], [data-portrait-reveal], [data-game-signal], [data-game-exit]')];
           return {
             label, path: location.pathname, triggers: triggers?.length ?? null,
             staleTriggers: targets ? targets.filter(target => !document.documentElement.contains(target)).length : null,
@@ -288,7 +288,7 @@ try {
         const gliding = document.documentElement.classList.contains('lenis-smooth');
         return !gliding && headerBottom >= 65 && top >= headerBottom - 3 && (top <= headerBottom + 80 || (atEnd && top < innerHeight));
       }, id, { timeout: 6000 });
-      for (const [href, id] of [['/#mind','mind'], ['/#education','education'], ['/#skills','skills'], ['/#work','work'], ['/#signal-run','signal-run'], ['/#contact','contact']]) {
+      for (const [href, id] of [['/#mind','mind'], ['/#education','education'], ['/#skills','skills'], ['/#work','work'], ['/#contact','contact']]) {
         await page.locator(`header a[href="${href}"]`).click();
         await page.waitForURL(url => url.hash === `#${id}`);
         await landing(id);
@@ -297,15 +297,15 @@ try {
         assert.ok(measurement.top >= measurement.headerBottom - 3 && (measurement.top <= measurement.headerBottom + 80 || (measurement.atDocumentEnd && measurement.top < 1000)), `#${id} must land below the sticky header or at document end: ${JSON.stringify(measurement)}`);
       }
       await page.goBack();
-      await page.waitForURL(url => url.hash === '#signal-run');
-      await landing('signal-run');
+      await page.waitForURL(url => url.hash === '#work');
+      await landing('work');
       await page.goForward();
       await page.waitForURL(url => url.hash === '#contact');
       await landing('contact');
       await page.reload({ waitUntil: 'networkidle' });
       await page.waitForURL(url => url.hash === '#contact');
       await landing('contact');
-      report.observations.anchorHistory = { back: '#signal-run', forward: '#contact', reload: '#contact' };
+      report.observations.anchorHistory = { back: '#work', forward: '#contact', reload: '#contact' };
     } finally { await context.close(); }
   });
 
@@ -335,6 +335,7 @@ try {
       await page.getByRole('tab', { name: /02 Software/ }).click();
       assert.match(await page.locator('#mind').getByRole('tabpanel', { name: /Software/ }).innerText(), /Python and MySQL/);
       await page.locator('#mind').screenshot({ path: 'test-results/webgl-fallback.png' });
+      await page.goto(base + '/play/', { waitUntil: 'networkidle' });
       await page.locator('#signal-run').scrollIntoViewIfNeeded();
       await page.getByRole('button', { name: 'PRESS START →', exact: true }).waitFor();
       assert.equal(await page.locator('#signal-run canvas').evaluate(canvas => Boolean(canvas.getContext('2d'))), true);
@@ -365,6 +366,7 @@ try {
       assert.ok(workTop >= headerBottom - 3 && workTop <= headerBottom + 80, `Mobile #work must clear the glass navigation: ${workTop}`);
       assert.equal(nativeTouch.coarsePointer, true);
       assert.equal(nativeTouch.locomotiveActive, false, 'Touch devices should use native momentum scrolling');
+      await page.goto(base + '/play/', { waitUntil: 'networkidle' });
       await page.locator('#signal-run').scrollIntoViewIfNeeded();
       const start = page.getByRole('button', { name: 'PRESS START →', exact: true });
       await start.waitFor();

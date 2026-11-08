@@ -15,6 +15,7 @@
   object-fit:contain;
   object-position:center bottom;
   pointer-events:none;
+  transition:opacity .35s ease;
 }
 
 .canvas {
@@ -24,11 +25,36 @@
   height:100%;
   pointer-events:none;
   opacity:0;
+  transition:opacity .35s ease;
 }
 
 .portrait[data-portrait-state='code'] {
   .image { opacity:0; }
   .canvas { opacity:1; }
+}
+
+// The two masks travel together so the code scan replaces the photo from hair to shirt.
+@supports (mask-image: linear-gradient(#000, transparent)) {
+  .image, .canvas { mask-position:0 100%; }
+
+  .portrait[data-portrait-ready] {
+    .image, .canvas {
+      opacity:1;
+      mask-repeat:no-repeat;
+      mask-size:100% 220%;
+      transition:mask-position .6s cubic-bezier(.24,.68,.22,1);
+    }
+    .image { mask-image:linear-gradient(transparent 46%, #000 54%); }
+    .canvas { mask-image:linear-gradient(#000 46%, transparent 54%); }
+    &[data-portrait-state='code'] {
+      .image, .canvas { mask-position:0 0%; }
+    }
+  }
+}
+
+:global(html[data-theme='cyber']) .image {
+  filter:grayscale(1) sepia(.2) hue-rotate(170deg) saturate(1.6) brightness(1.12)
+    drop-shadow(0 0 18px color-mix(in srgb, var(--blue, #4568ff) 16%, transparent));
 }
 
 .toggle {
@@ -43,8 +69,8 @@
   align-items:center;
   gap:.85rem;
   padding:.7rem 1rem;
-  border:1px solid rgba($ink,.3);
-  background:rgba($paper,.94);
+  border:1px solid color-mix(in srgb, #{$ink} 30%, transparent);
+  background:color-mix(in srgb, #{$paper} 94%, transparent);
   color:$ink;
   font-family:var(--font-mono),monospace;
   font-size:.55rem;
@@ -58,10 +84,12 @@
   &:disabled { opacity:.65;cursor:default; }
 }
 
+:global(html[data-theme='cyber']) .toggle[aria-pressed='true'] > span:first-child { color:#124dad; }
+
 @media(max-width:700px) {
   .toggle { bottom:6%;gap:.65rem;padding:.65rem .8rem;font-size:.5rem; }
 }
 
 @media(prefers-reduced-motion:reduce) {
-  .toggle { transition:none; }
+  .toggle, .image, .canvas { transition:none; }
 }

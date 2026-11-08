@@ -93,6 +93,18 @@
   font: .51rem/1.7 var(--font-mono), monospace;
 }
 
+.learning { margin-top: clamp(2.5rem, 5vw, 4rem); }
+
+.learningHeading {
+  @include mono;
+  padding-bottom: .85rem;
+  border-bottom: 1px solid $line;
+  color: $ink;
+  font-weight: 500;
+}
+
+.courseTitle { margin: 0; font-size: 1.5rem; font-weight: 600; letter-spacing: -.045em; }
+
 .follower {
   position: fixed;
   z-index: 90;
@@ -102,9 +114,9 @@
   opacity: 0;
   overflow: hidden;
   pointer-events: none;
-  border: 1px solid rgba($ink, .24);
+  border: 1px solid tint($ink, .24);
   background: $paper;
-  box-shadow: 0 12px 35px rgba($ink, .22);
+  box-shadow: 0 12px 35px tint(var(--band-bg), .22);
 
   img { display: block; width: 100%; height: auto; }
 }
@@ -118,9 +130,9 @@
   background: $paper;
   color: $ink;
   overscroll-behavior: contain;
-  box-shadow: 0 18px 60px rgba($ink, .22);
+  box-shadow: 0 18px 60px tint(var(--band-bg), .22);
 
-  &::backdrop { background: rgba($ink, .66); }
+  &::backdrop { background: tint(var(--band-bg), .66); }
 }
 
 .dialogContent {
@@ -171,6 +183,7 @@
     strong { grid-column: 2; justify-self: start; font-size: 1rem; }
   }
   .number, .note { font-size: .45rem; }
+  .courseTitle { font-size: 1.2rem; }
   .detail {
     grid-column: 2;
     flex-direction: column;

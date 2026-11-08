@@ -1,10 +1,11 @@
-import { achievements } from '@/content/portfolio';
+import { achievements, feedbackCourse } from '@/content/portfolio';
 import { EvidencePreviews, type Certificate } from './EvidencePreviews';
 import styles from './EvidenceChapter.module.scss';
 
 type AchievementId = (typeof achievements)[number]['id'];
+const { id: courseId, title: courseTitle, provider: courseProvider, date: courseDate } = feedbackCourse;
 
-const certificates: Partial<Record<AchievementId, Certificate>> = {
+const certificates: Partial<Record<AchievementId, Certificate>> & Record<typeof courseId, Certificate> = {
   brainwiz: {
     title: 'Brainwiz certificate',
     caption: 'Amalthea ’25 · IIT Gandhinagar · 25th place',
@@ -23,12 +24,21 @@ const certificates: Partial<Record<AchievementId, Certificate>> = {
     height: 1440,
     alt: 'LaserHacks 2025 Certificate of Participation for team UnfairSphere, listing Piyush Rajput.',
   },
+  [courseId]: {
+    title: `${courseTitle} certificate`,
+    caption: `${courseProvider} · ${courseDate} · Certificate ID withheld`,
+    src: '/certificates/leadership-feedback.webp',
+    preview: '/certificates/leadership-feedback-preview.webp',
+    width: 1440,
+    height: 1113,
+    alt: `${courseProvider} certificate for Piyush Rajput’s completion of ${courseTitle} on ${courseDate}.`,
+  },
 };
 
 export function EvidenceChapter() {
   return (
     <section id="evidence" className={styles.evidence} aria-labelledby="evidence-title">
-      <p className="chapter-label"><b>06</b> THE EVIDENCE</p>
+      <p className="chapter-label"><b>05</b> THE EVIDENCE</p>
       <div className={styles.intro}>
         <h2 id="evidence-title" className="chapter-heading" data-reveal>Small steps.<br/><span className="serif">Real milestones.</span></h2>
         <p>No shortcuts. Just showing up,<br/>working with others, and learning.</p>
@@ -53,8 +63,25 @@ export function EvidenceChapter() {
             </article>
           );
         })}
+        <p className={styles.note}>Competition milestones, separate from the achievements inside Signal Run.</p>
+        <section className={styles.learning} aria-labelledby="continuing-learning-title">
+          <h3 id="continuing-learning-title" className={styles.learningHeading}>Continuing Learning</h3>
+          <article data-course-credential={courseId} data-certificate={courseId}>
+            <span className={styles.number} aria-hidden="true">[ C01 ]</span>
+            <div className={styles.title}>
+              <h4 className={styles.courseTitle}>{courseTitle}</h4>
+              <p>{courseProvider} · <time dateTime={feedbackCourse.dateTime}>{courseDate}</time></p>
+            </div>
+            <strong>Course completed</strong>
+            <div className={styles.detail}>
+              <p>{feedbackCourse.description}</p>
+              <a href={certificates[courseId].src} data-certificate-action aria-haspopup="dialog" aria-label={`View ${certificates[courseId].title}`}>
+                Certificate <span aria-hidden="true">↗</span>
+              </a>
+            </div>
+          </article>
+        </section>
       </EvidencePreviews>
-      <p className={styles.note}>Competition milestones, separate from the achievements inside Signal Run.</p>
     </section>
   );
 }

@@ -1,5 +1,4 @@
-// Reserve the complete game chrome and stage before loading its code. This also
-// keeps downstream Skills/Contact anchors fixed when the module arrives.
+// Reserve the arcade and its controls while the game chunk loads.
 .shell {
   min-height:calc(min(1200px, 100vw - var(--gutter) - var(--gutter)) / 2.4 + 320px);
 }

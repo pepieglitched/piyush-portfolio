@@ -20,3 +20,36 @@
 .stack { font: .6rem/1.8 var(--font-mono, monospace); letter-spacing: .02em; text-transform: uppercase; color: #66666b; margin: 1.25rem 0 .4rem; }
 @media (max-width: 780px) { .explorer { grid-template-columns: 1fr; gap: 2.5rem; } .visual { width: min(100%, 31rem); margin-inline: auto; } .panel { min-height: 16rem; } .tabs button { font-size: 1.45rem; } }
 @media (prefers-reduced-motion: reduce) { .tabs button { transition: none; } }
+
+:global(html[data-theme='cyber']) {
+  .canvas {
+    background: radial-gradient(ellipse at center, #11243e 0, var(--paper) 72%);
+  }
+  .crosshair {
+    border-color: var(--line);
+    &::before, &::after { background: var(--line); }
+  }
+  .coordinate, .diagramNote, .node, .stack { color: var(--graphite); }
+  .node { background: var(--panel); border-color: var(--red); }
+  .nodeTwo { border-color: var(--blue); }
+  .fallback i { border-color: rgba(65, 135, 255, .6); }
+  .fallback i:nth-of-type(2) { border-color: rgba(131, 181, 255, .6); }
+  .fallback i:nth-of-type(3) { border-color: var(--line); }
+  .sphere { background-image: radial-gradient(var(--blue) 1px, transparent 1.5px); }
+  .core { color: var(--red-text); }
+  .tabs {
+    border-color: var(--line);
+    button {
+      border-bottom-color: var(--line);
+      color: var(--graphite);
+      &:is(:hover, [aria-selected='true']) { color: var(--ink); }
+      &[aria-selected='true'] :is(span:first-child, span:last-child) { color: var(--red-text); }
+      &:focus-visible { outline-color: var(--blue); }
+    }
+  }
+  .panel {
+    p { color: var(--graphite); }
+    a { color: var(--ink); border-color: var(--line); }
+    &:focus-visible, a:focus-visible { outline-color: var(--blue); }
+  }
+}

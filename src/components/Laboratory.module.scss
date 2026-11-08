@@ -1,6 +1,6 @@
 @use '../styles/tokens' as *;
 .lab { display:grid; grid-template-columns:1.1fr .9fr; gap:7vw; align-items:start; margin-top:4rem; }
-.window { border:1px solid $ink; box-shadow:8px 8px 0 rgba($ink,.08); }
+.window { border:1px solid $ink; box-shadow:8px 8px 0 tint($ink,.08); }
 .bar { @include mono; background:$ink; color:$paper; display:flex; justify-content:space-between; padding:.8rem 1rem; span:first-child {letter-spacing:.15em;color:$red;} }
 .files { padding:1.2rem 1.5rem; display:flex; flex-direction:column; gap:.5rem; button { display:flex; align-items:center; text-align:left; gap:1rem; border:0; border-bottom:1px solid $line; background:none; padding:.85rem 0; font-size:.9rem; &[aria-selected=true] { color:$red; } small { @include mono; display:block; margin-top:.3rem; font-size:.56rem; } >span:last-child {margin-left:auto;} } }
 .folder { width:27px; height:20px; border:1px solid; position:relative; flex:none; &::before {content:''; position:absolute; width:11px; height:5px; border:1px solid; border-bottom:0; top:-6px; left:-1px;} }

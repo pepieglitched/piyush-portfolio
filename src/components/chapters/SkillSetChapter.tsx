@@ -83,7 +83,7 @@ export default function SkillSetChapter() {
     <section id="skills" className={styles.skills} aria-labelledby="skills-title" data-chapter="skills">
       <header className={styles.intro}>
         <div>
-          <p className="chapter-label"><b>05</b> THE SKILL SET</p>
+          <p className="chapter-label"><b>04</b> THE SKILL SET</p>
           <h2 id="skills-title" className="chapter-heading" data-word-reveal>A growing<br /><span className="serif">vocabulary.</span></h2>
         </div>
         <p>Tools I’ve used, concepts I’m studying, and systems I’m still figuring out.<span>Experience has context. Here’s mine.</span></p>

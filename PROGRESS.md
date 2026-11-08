@@ -69,3 +69,26 @@ The original source archive remains in outputs. The V3 source archive is a separ
 - The production build, TypeScript compilation, lint, 29 integration checks, and seven lifecycle checks passed. Four axe scans reported zero violations.
 - Firefox and Safari use the SCSS fallback and were unavailable for direct testing. The CSS fallback was exercised on Chromium without the SVG layer and at touch sizes.
 - V5 is packaged from this checkout for the same owner-private Site. No app changes are pending. Reuse the existing Site ID and check its current live version before the next release.
+
+# Portfolio Iteration V6
+
+## Audit and integration
+
+- Started from V5 commit 4582557 and reviewed JarnKet's graphite, blue, and fine-grid visual language as inspiration for a separate Cyber palette.
+- Optimized the supplied transparent controller sticker as a WebP and kept it out of the initial page load.
+- Integrated the verified LinkedIn Learning course, Leadership through Feedback, as a separate Continuing Learning record. Added keyboard, touch, and row-hover previews through the existing certificate system. The image derivatives omit the certificate identifier, and `/llms-full.txt` uses the same course record as the page.
+- The Viksit Bharat Buildathon PDF contains media collateral. Neither supplied PDF verifies OlympAI or Smart India Hackathon, so those two previews remain inactive. The four competition records and LaserHacks finalist status are preserved.
+- Moved Signal Run into the standalone route. The home page imports only the discovery control. The new route is in the sitemap and text edition.
+- Replaced competing horizontal project title transforms with a vertical reveal on the copy inside a shared grid. The number, status, and arrow columns stay in place.
+- Added a nonblocking boot rail for full home loads. It responds to portrait and font readiness with a bounded escape, and the page paints throughout.
+
+## V6 verified
+
+- `npm.cmd run build` generated 13 static pages. ESLint, standalone TypeScript, and `git diff --check` passed.
+- The 30 integration checks and seven lifecycle checks passed. Chrome and Edge verified navigation, Locomotive Scroll and GSAP lifecycle, keyboard focus, reduced motion, WebGL fallback, and responsive layouts. Automated axe scans found zero violations across five Editorial and four Cyber views.
+- Full portrait conversion covers the actual silhouette and restores the halftone on pointer exit. Touch and keyboard controls work, and reduced motion shows a static conversion. Measured laptop, tablet, and desktop layouts keep the enlarged portrait clear of the navbar.
+- The controller invitation supports desktop and touch, restores focus and scroll on dismissal, and opens the standalone Signal Run route. Verified both arcade and turn-based play, return links, canonical metadata, sitemap, and public text resources.
+- Editorial remains the default. The Cyber choice restores before hydration and persists on reload. Theme and mobile menu controls fit at 320px and 390px. Verified stable project column alignment on scroll and client navigation, and limited the boot rail to full loads.
+- Disabled automatic project route prefetch after reproducing invalid RSC prefetch requests in the Windows static export. Client navigation still works, and no browser errors remained in the tested routes.
+- Local Lighthouse accessibility and SEO scored 100 on all four runs. Desktop performance scored 100 with FCP 0.32 s, LCP 0.62 s, and CLS 0.010. Three mobile runs scored 75–88 with FCP 1.09–1.13 s, LCP 2.72–3.20 s, and CLS 0–0.008. Mobile LCP and performance remain outside the targets. The hero portrait was the LCP element and was requested eagerly with high priority. Field INP, Safari, Firefox, physical devices, and manual screen-reader behavior were unmeasured.
+- Release target: the existing owner-private Site. Preserve its access policy. Only add the two remaining competition previews when matching evidence is supplied.

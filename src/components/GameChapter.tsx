@@ -2,7 +2,18 @@
 import dynamic from 'next/dynamic';
 import { useEffect, useRef, useState } from 'react';
 import styles from './GameChapter.module.scss';
-const SignalRun = dynamic(() => import('./game/SignalRun'), { ssr: false, loading: () => <div style={{ padding: '5rem 1rem', textAlign: 'center', fontFamily: 'var(--font-mono)' }}>INITIALIZING SIGNAL RUN…</div> });
+
+function GamePlaceholder() {
+  return (
+    <div className={styles.placeholder}>
+      SIGNAL RUN / READYING THE ARCADE
+      <noscript><p>Enable JavaScript to play Signal Run.</p></noscript>
+    </div>
+  );
+}
+
+const SignalRun = dynamic(() => import('./game/SignalRun'), { ssr: false, loading: GamePlaceholder });
+
 export default function GameChapter() {
   const root = useRef<HTMLDivElement>(null);
   const [ready, setReady] = useState(false);
@@ -11,5 +22,5 @@ export default function GameChapter() {
     if (root.current) observer.observe(root.current);
     return () => observer.disconnect();
   }, []);
-  return <div ref={root} className={styles.shell} data-game-shell>{ready ? <SignalRun /> : <div className={styles.placeholder}>SIGNAL RUN / A PLAYABLE INTERMISSION<noscript><p>Enable JavaScript to play this optional game. All portfolio content is available below.</p></noscript></div>}</div>;
+  return <div ref={root} className={styles.shell} data-game-shell>{ready ? <SignalRun /> : <GamePlaceholder />}</div>;
 }

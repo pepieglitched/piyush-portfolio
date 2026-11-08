@@ -1,11 +1,18 @@
-$paper: #f3f0e8;
-$ink: #0b0c0f;
-$graphite: #33343a;
-$red: #ed3345;
-$red-text: #bf2434; // Accessible small text on Archive Paper; Signal Red remains the graphic accent.
-$yellow: #f5d547;
-$blue: #4568ff;
-$line: rgba(11, 12, 15, .22);
+@use 'sass:math';
+
+$paper: var(--paper);
+$ink: var(--ink);
+$graphite: var(--graphite);
+$red: var(--red);
+$red-text: var(--red-text);
+$yellow: var(--yellow);
+$blue: var(--blue);
+$line: var(--line);
+
+@function tint($color, $opacity) {
+  @return color-mix(in srgb, $color math.percentage($opacity), transparent);
+}
+
 @mixin mono { font-family: var(--font-mono), monospace; font-size: .68rem; letter-spacing: .055em; text-transform: uppercase; }
 @mixin section { padding: 7rem var(--gutter); }
 @mixin mobile { @media(max-width: 700px) { @content; } }

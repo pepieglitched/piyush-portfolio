@@ -21,10 +21,14 @@
   display: grid;
   place-items: center;
   border: 1px solid $line;
-  background: rgba($ink, .025);
+  background: tint($ink, .025);
   color: $graphite;
 }
 .skillIcon { display: block; width: 1.0625rem; height: 1.0625rem; object-fit: contain; }
+:global(html[data-theme='cyber']) .skillMark:has(img) {
+  background: #dfeaff;
+  border-color: #89a7d6;
+}
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
   .skillIcon { transition: transform .26s ease; }
   .items li:hover .skillIcon { transform: translateY(-1px) scale(1.1); }

@@ -1,0 +1,69 @@
+.signal {
+  display: inline-flex;
+  align-items: center;
+  gap: .55rem;
+}
+
+.lamp {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  background: var(--red);
+  border-radius: 50%;
+}
+
+.readout {
+  display: inline-grid;
+  align-items: center;
+  overflow: hidden;
+
+  > span { grid-area: 1 / 1; }
+}
+
+.startup {
+  visibility: hidden;
+  color: var(--red-text, #bf2434);
+}
+
+.sweep {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+
+  > span {
+    display: block;
+    width: 34%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, var(--red) 88%, transparent);
+    transform: translateX(-100%);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :global(html[data-portfolio-boot='loading']) {
+    .ready { animation: return-status 0s 1.6s both; }
+    .startup { visibility: visible; animation: boot-status .22s ease-out both, expire-status 0s 1.6s forwards; }
+    .sweep { animation: rail-glow 1.6s both; }
+    .sweep > span { animation: sweep-rail 1.15s cubic-bezier(.2,.78,.25,1) both; }
+    .lamp { border-radius: 0; animation: boot-lamp .75s ease-out both; }
+  }
+
+  :global(html[data-portfolio-boot='ready']) {
+    .ready { animation: boot-status .32s cubic-bezier(.22,1,.36,1) both; }
+    .sweep { animation: release-rail .55s ease-out both; }
+    .sweep > span { animation: sweep-rail .55s ease-out both; }
+  }
+}
+
+@keyframes boot-status { from { opacity: 0; transform: translateY(90%); } to { opacity: 1; transform: translateY(0); } }
+@keyframes return-status { from { visibility: hidden; } to { visibility: visible; } }
+@keyframes expire-status { to { visibility: hidden; } }
+@keyframes rail-glow { 0%, 100% { opacity: 0; } 12%, 80% { opacity: 1; } }
+@keyframes sweep-rail { to { transform: translateX(300%); } }
+@keyframes release-rail { from { opacity: .7; } to { opacity: 0; } }
+@keyframes boot-lamp { from { transform: rotate(45deg) scale(.45); } to { transform: rotate(0) scale(1); } }

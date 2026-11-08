@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import styles from './SignalRun.module.scss';
 
@@ -12,6 +13,8 @@ const CORE_NAMES = ['AI', 'SOFTWARE', 'ROBOTICS'];
 const CORE_X = [1150, 2700, 4400];
 const BUGS = [620, 1780, 3300, 3960];
 const FLOOR = 310;
+const editorialField = { background: '#101216', grid: '#23262d', skyline: '#1c2028', circuit: '#4568ff', floor: '#292d35', trace: '#171a20', progress: '#ed3345' };
+const cyberField = { background: '#071020', grid: '#172c4d', skyline: '#0e1d37', circuit: '#6bb2ff', floor: '#183457', trace: '#101e38', progress: '#64a9ff' };
 const freshWorld = (): World => ({ x: 110, y: FLOOR, vy: 0, score: 0, lives: 3, cores: [false, false, false], seconds: 0, invulnerable: 0, camera: 0, turn: 0 });
 const turnPositions = [620, 1150, 1780, 2700, 3960, 4400];
 const snap = (world: World): Snapshot => ({ score: world.score, lives: world.lives, cores: [...world.cores], seconds: Math.floor(world.seconds), turn: world.turn });
@@ -96,12 +99,14 @@ export default function SignalRun() {
     if (!context) return;
     let viewWidth = 960;
     let scale = 1;
+    const fieldColors = () => document.documentElement.dataset.theme === 'cyber' ? cyberField : editorialField;
+    let palette = fieldColors();
     const draw = () => {
       const world = worldRef.current;
       const w = viewWidth;
       context.setTransform(scale, 0, 0, scale, 0, 0);
-      context.fillStyle = '#101216'; context.fillRect(0, 0, w, 400);
-      context.strokeStyle = '#23262d'; context.lineWidth = 1;
+      context.fillStyle = palette.background; context.fillRect(0, 0, w, 400);
+      context.strokeStyle = palette.grid; context.lineWidth = 1;
       for (let x = -(world.camera * .18 % 60); x < w; x += 60) {
         context.beginPath(); context.moveTo(x, 0); context.lineTo(x, FLOOR); context.stroke();
       }
@@ -109,16 +114,16 @@ export default function SignalRun() {
         context.beginPath(); context.moveTo(0, y); context.lineTo(w, y); context.stroke();
       }
       // A quiet circuit skyline provides scale without an ambient animation loop.
-      context.fillStyle = '#1c2028';
+      context.fillStyle = palette.skyline;
       for (let i = -1; i < 10; i++) {
         const x = i * 170 - world.camera * .12 % 170;
         context.fillRect(x, 190 - (i % 3) * 28, 90, 120 + (i % 3) * 28);
-        context.fillStyle = '#4568ff'; context.fillRect(x + 12, 215 - (i % 3) * 28, 4, 4); context.fillStyle = '#1c2028';
+        context.fillStyle = palette.circuit; context.fillRect(x + 12, 215 - (i % 3) * 28, 4, 4); context.fillStyle = palette.skyline;
       }
       context.save(); context.translate(-world.camera, 0);
-      context.fillStyle = '#292d35'; context.fillRect(world.camera, FLOOR, w, 90);
+      context.fillStyle = palette.floor; context.fillRect(world.camera, FLOOR, w, 90);
       context.fillStyle = '#f3f0e8'; context.fillRect(world.camera, FLOOR, w, 2);
-      context.fillStyle = '#171a20';
+      context.fillStyle = palette.trace;
       for (let x = Math.floor(world.camera / 48) * 48; x < world.camera + w; x += 48) {
         context.fillRect(x, FLOOR + 14, 34, 6); context.fillRect(x + 16, FLOOR + 40, 30, 4);
       }
@@ -129,7 +134,7 @@ export default function SignalRun() {
         context.fillStyle = '#0b0c0f'; context.fillRect(x - 2, 264, 4, 8);
         context.font = '10px monospace'; context.textAlign = 'center'; context.fillStyle = '#f3f0e8';
         context.fillText(CORE_NAMES[i], x, 235);
-        context.fillStyle = '#4568ff'; context.fillRect(x - 1, 294, 2, 10);
+        context.fillStyle = palette.circuit; context.fillRect(x - 1, 294, 2, 10);
       });
       BUGS.forEach(x => {
         context.fillStyle = '#ed3345'; context.fillRect(x - 13, FLOOR - 20, 26, 18);
@@ -146,14 +151,14 @@ export default function SignalRun() {
       context.fillRect(px - 2, py - 42, 4, 6);
       context.fillStyle = '#ed3345'; context.fillRect(px - 3, py - 45, 6, 4);
       context.fillStyle = '#0b0c0f'; context.fillRect(px - 7, py - 31, 14, 7);
-      context.fillStyle = '#4568ff'; context.fillRect(px - 5, py - 29, 3, 3); context.fillRect(px + 2, py - 29, 3, 3);
+      context.fillStyle = palette.circuit; context.fillRect(px - 5, py - 29, 3, 3); context.fillRect(px + 2, py - 29, 3, 3);
       context.fillStyle = '#ed3345'; context.fillRect(px - 3, py - 15, 6, 5);
       context.restore();
       context.font = '10px monospace'; context.textAlign = 'left'; context.fillStyle = '#a5a7ae';
       context.fillText('SECTOR 04 / THE BUILDER\'S MIND', 24, 28);
-      context.fillStyle = '#4568ff'; context.fillText(`X:${String(Math.floor(world.x)).padStart(4, '0')}`, 24, 46);
+      context.fillStyle = palette.circuit; context.fillText(`X:${String(Math.floor(world.x)).padStart(4, '0')}`, 24, 46);
       context.fillStyle = '#64666e'; context.fillRect(24, 370, w - 48, 2);
-      context.fillStyle = '#ed3345'; context.fillRect(24, 370, (w - 48) * Math.min(world.x / 4400, 1), 2);
+      context.fillStyle = palette.progress; context.fillRect(24, 370, (w - 48) * Math.min(world.x / 4400, 1), 2);
       context.fillStyle = '#a5a7ae'; context.textAlign = 'right'; context.fillText('COLLECT IDEAS. KEEP BUILDING.', w - 24, 350);
     };
     drawRef.current = draw;
@@ -167,7 +172,13 @@ export default function SignalRun() {
       draw();
     };
     const observer = new ResizeObserver(resize); observer.observe(stage); resize();
-    return () => { observer.disconnect(); drawRef.current = () => {}; };
+    const themeChanged = () => { palette = fieldColors(); draw(); };
+    window.addEventListener('portfolio:theme', themeChanged);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('portfolio:theme', themeChanged);
+      drawRef.current = () => {};
+    };
   }, []);
 
   useEffect(() => {
@@ -284,12 +295,12 @@ export default function SignalRun() {
         }}>
         <canvas ref={canvasRef} className={styles.canvas} aria-hidden="true" />
         {phase !== 'running' && <div className={styles.overlay}><div>
-          <span className={styles.eyebrow}>{phase === 'won' ? 'ACHIEVEMENT UNLOCKED: CURIOUS MIND' : phase === 'lost' ? 'A BUG IS JUST ANOTHER LESSON' : phase === 'paused' ? 'TAKE YOUR TIME' : 'AN ORIGINAL PLAYABLE INTERMISSION'}</span>
+          <span className={styles.eyebrow}>{phase === 'won' ? 'ACHIEVEMENT UNLOCKED: CURIOUS MIND' : phase === 'lost' ? 'A BUG IS JUST ANOTHER LESSON' : phase === 'paused' ? 'TAKE YOUR TIME' : 'AN ORIGINAL PORTFOLIO GAME'}</span>
           <h3>{phase === 'won' ? <>MISSION<br />COMPLETE.</> : phase === 'lost' ? <>SIGNAL<br />LOST.</> : phase === 'paused' ? 'PAUSED.' : <>IDEAS DON’T<br />COLLECT THEMSELVES.</>}</h3>
           <p>{phase === 'won' ? 'Three cores. One curious mind. Keep exploring the skills behind the experience.' : phase === 'lost' ? 'Debug, retry, repeat. Every builder knows the process.' : phase === 'paused' ? 'Your ideas are right where you left them.' : 'A tiny robot. Three energy cores. A few bugs along the way. Sound familiar?'}</p>
           <div className={styles.actions}>
             <button className={styles.primary} onClick={() => start(phase !== 'paused')}>{phase === 'paused' ? 'RESUME →' : phase === 'won' || phase === 'lost' ? 'PLAY AGAIN ↻' : 'PRESS START →'}</button>
-            {(phase === 'won' || phase === 'lost') && <a href="#skills">TO THE SKILLS ↗</a>}
+            {(phase === 'won' || phase === 'lost') && <Link href="/#skills">TO THE SKILLS ↗</Link>}
           </div>
         </div></div>}
       </div>
@@ -301,7 +312,7 @@ export default function SignalRun() {
           <button onClick={() => { if (phase === 'running') { transition('paused'); setMessage('Game paused.'); } else if (phase === 'paused') start(false); }} disabled={phase !== 'running' && phase !== 'paused'}>{phase === 'paused' ? 'RESUME' : 'PAUSE'}</button>
           <button onClick={() => start()}>RESTART</button>
           <button onClick={() => { void toggleAudio(); }} aria-pressed={!muted} aria-label={muted ? 'Enable game sounds' : 'Mute game sounds'}>{muted ? 'SOUND OFF' : 'SOUND ON'}</button>
-          <a href="#skills" onClick={() => { if (phase === 'running') transition('paused'); }}>SKIP ↗</a>
+          <Link href="/#skills" onClick={() => { if (phase === 'running') transition('paused'); }}>SKIP ↗</Link>
         </div>
       </div>
       <div className={styles.playControls}>

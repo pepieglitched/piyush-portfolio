@@ -173,6 +173,15 @@ export const achievements = [
   { id: "laserhacks", title: "LaserHacks", result: "Finalist — Top 7 Teams", context: "Lasell University, USA · UnfairSphere · November 15–16, 2025", year: "2025", description: "Reached the finals of LaserHacks as part of one of seven finalist teams. Although we did not win, our team successfully competed in the final round." },
 ] as const;
 
+export const feedbackCourse = {
+  id: 'leadership-feedback',
+  title: 'Leadership through Feedback',
+  provider: 'LinkedIn Learning',
+  date: 'November 7, 2026 (UTC)',
+  dateTime: '2026-11-07T21:16:00Z',
+  description: 'Completed the 1-hour, 21-minute course on constructive feedback.',
+} as const;
+
 export const experiments = [
   { title: "Smart Calendar", status: "Exploring", description: "ESP32, LED indicators, LCD tasks, and real-time clock concepts.", slug: "smart-calendar" },
   { title: "Autonomous Driving Robot", status: "Architecture", description: "A proposed Raspberry Pi system connecting perception, sensors, and motors.", slug: "autonomous-robot" },

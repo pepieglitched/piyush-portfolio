@@ -6,7 +6,8 @@ From curiosity to creation. This portfolio distinguishes built work, prototypes,
 
 ## Public information
 
-- [Portfolio](/): The Builder's Mind, an editorial portfolio with a playable intermission.
+- [Portfolio](/): The Builder's Mind, an editorial portfolio with an optional Cyber theme.
+- [Signal Run](/play/): A separate, optional game.
 - [About](/about.md): Biography, verified education, interests, and public profiles.
 - [Education](/education.md): Academic stages, confirmed programme details, coursework, and interests.
 - [Projects](/projects.md): Accurate project records and development status.

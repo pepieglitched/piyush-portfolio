@@ -1,8 +1,9 @@
 "use client";
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useSyncExternalStore } from "react";
 import * as THREE from "three";
+import { readTheme, subscribeTheme } from "@/lib/theme";
 import styles from "./MindScene.module.scss";
 
 type SceneProps = { selected: number; active: boolean; onFailure: () => void; onReady: () => void };
@@ -24,21 +25,23 @@ const fragmentShader = /* glsl */ `
   precision mediump float;
   varying float vDomain;
   uniform float uSelected;
+  uniform float uCyber;
   void main() {
     vec2 point = gl_PointCoord - 0.5;
     float radius = length(point);
     if (radius > 0.5) discard;
     float edge = 1.0 - smoothstep(0.34, 0.5, radius);
     float selected = 1.0 - step(0.15, abs(vDomain - uSelected));
-    vec3 carbon = vec3(0.043, 0.047, 0.059);
-    vec3 signal = vec3(0.929, 0.200, 0.271);
-    vec3 scanner = vec3(0.271, 0.408, 1.0);
+    vec3 carbon = mix(vec3(0.043, 0.047, 0.059), vec3(0.55, 0.70, 0.91), uCyber);
+    vec3 signal = mix(vec3(0.929, 0.200, 0.271), vec3(0.25, 0.53, 1.0), uCyber);
+    vec3 scanner = mix(vec3(0.271, 0.408, 1.0), vec3(0.56, 0.83, 1.0), uCyber);
     vec3 accent = mix(signal, scanner, step(1.5, vDomain));
     gl_FragColor = vec4(mix(carbon, accent, selected * 0.86), edge * mix(0.24, 0.92, selected));
   }
 `;
 
 function Network({ selected, active, onFailure, onReady }: SceneProps) {
+  const cyber = useSyncExternalStore(subscribeTheme, readTheme) === "cyber";
   const group = useRef<THREE.Group>(null);
   const material = useRef<THREE.ShaderMaterial>(null);
   const readySent = useRef(false);
@@ -46,6 +49,7 @@ function Network({ selected, active, onFailure, onReady }: SceneProps) {
   const { invalidate, gl } = useThree();
   const uniforms = useMemo(() => ({
     uSelected: { value: 0 },
+    uCyber: { value: 0 },
     uPixelRatio: { value: Math.min(gl.getPixelRatio(), 1.5) },
   }), [gl]);
 
@@ -69,9 +73,12 @@ function Network({ selected, active, onFailure, onReady }: SceneProps) {
   }, []);
 
   useEffect(() => {
-    if (material.current) material.current.uniforms.uSelected.value = selected;
+    if (material.current) {
+      material.current.uniforms.uSelected.value = selected;
+      material.current.uniforms.uCyber.value = Number(cyber);
+    }
     if (active) invalidate();
-  }, [active, selected, invalidate]);
+  }, [active, cyber, selected, invalidate]);
 
   useEffect(() => {
     const canvas = gl.domElement;
@@ -128,7 +135,7 @@ function Network({ selected, active, onFailure, onReady }: SceneProps) {
       {[0, 1, 2].map((index) => (
         <mesh key={index} rotation={[index * Math.PI / 3, index * 0.46, Math.PI / 4]}>
           <torusGeometry args={[1.55, 0.0025, 3, 100]} />
-          <meshBasicMaterial color={index === selected ? "#ED3345" : "#33343A"} transparent opacity={index === selected ? 0.56 : 0.13} />
+          <meshBasicMaterial color={index === selected ? (cyber ? "#4187ff" : "#ed3345") : (cyber ? "#8faee0" : "#33343a")} transparent opacity={index === selected ? 0.56 : 0.13} />
         </mesh>
       ))}
     </group>

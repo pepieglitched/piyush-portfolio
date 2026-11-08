@@ -110,14 +110,16 @@ export default function ChapterDriver({kind, scope}: Props) {
             if (title) entry.from(title, {y: 35, clipPath: 'inset(0 0 100% 0)'}, 'project-unlocked+=.45');
             if (desktop && art) gsap.fromTo(card, {y: index ? 25 : -10}, {y: index ? -35 : 20, ease: 'none', scrollTrigger: {trigger: card, start: 'top bottom', end: 'bottom top', scrub: .9}});
           });
-          q<HTMLElement>('[data-project-row]').forEach((row, index) => {
-            const title = row.querySelector('h3');
-            const number = row.querySelector('[data-project-number]');
-            const entry = gsap.timeline({defaults, scrollTrigger: {trigger: row, start: 'top 92%', toggleActions: 'play none none reverse'}});
-            entry.addLabel('archive-entry');
-            if (number) entry.from(number, {yPercent: 100}, 'archive-entry');
-            if (title) entry.from(title, {x: index % 2 ? 50 : -50}, 'archive-entry+=.08');
-            entry.from(row, {borderBottomColor: 'rgba(11,12,15,0)', duration: 1.2}, 'archive-entry');
+          q<HTMLElement>('[data-project-row]').forEach(row => {
+            const copy = row.querySelector('[data-project-row-copy]');
+            const rule = row.querySelector('[data-project-row-rule]');
+            const entry = gsap.timeline({
+              defaults: {duration: .58, ease: motionEase.editorial},
+              scrollTrigger: {trigger: row, start: 'top 94%', toggleActions: 'play none none reverse'},
+            });
+            // Keep all four columns in place. Reveal only the copy inside its grid cell.
+            if (copy) entry.from(copy, {y: 16, clipPath: 'inset(0 0 100% 0)', clearProps: 'transform,clipPath'}, 0);
+            if (rule) entry.from(rule, {scaleX: .15, clearProps: 'transform'}, .08);
           });
           break;
         }

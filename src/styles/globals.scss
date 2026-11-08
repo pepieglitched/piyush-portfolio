@@ -1,11 +1,13 @@
 @use 'tokens' as *;
+@use 'themes';
 @import 'locomotive-scroll/locomotive-scroll.css';
-:root { --paper:#f3f0e8; --ink:#0b0c0f; --red:#ed3345; --gutter:clamp(1.25rem,4.5vw,5rem); }
+@include themes.palette;
 * { box-sizing:border-box; }
-html { scroll-behavior:auto; scroll-padding-top:7.5rem; }
-body { margin:0; background:$paper; color:$ink; font-family:var(--font-space),Arial,sans-serif; -webkit-font-smoothing:antialiased; }
+html { scroll-behavior:auto; scroll-padding-top:7.5rem; background-color:$paper; }
+body { margin:0; background-color:$paper; color:$ink; font-family:var(--font-space),Arial,sans-serif; -webkit-font-smoothing:antialiased; transition:background-color .28s ease,color .22s ease; }
 body::after { content:''; position:fixed; inset:0; pointer-events:none; z-index:20; opacity:.1; background-image:url('/grain.svg'); }
 ::selection { background:$red; color:$paper; }
+[data-theme='cyber'] ::selection { color:var(--on-accent); }
 a { color:inherit; text-decoration:none; }
 button,input,textarea { font:inherit; }
 button,a { -webkit-tap-highlight-color:transparent; }
@@ -22,7 +24,7 @@ main { overflow:clip; }
 .sr-only { position:absolute; width:1px; height:1px; margin:-1px; padding:0; clip:rect(0,0,0,0); overflow:hidden; white-space:nowrap; border:0; }
 .eyebrow { @include mono; display:flex; align-items:center; gap:.7rem; }
 .eyebrow::before { content:''; width:6px; height:6px; background:$red; flex:none; }
-.chapter-label { @include mono; color:rgba(11,12,15,.68); }
+.chapter-label { @include mono; color:tint($ink,.68); }
 .chapter-label b { color:$red-text; font-weight:400; margin-right:1.5rem; }
 .chapter-heading { font-size:clamp(3.5rem,7.5vw,8rem); letter-spacing:-.075em; line-height:.97; }
 .serif { font-family:var(--font-serif),Georgia,serif; font-weight:400; font-style:italic; letter-spacing:-.035em; }

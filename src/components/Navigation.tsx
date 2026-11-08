@@ -7,11 +7,12 @@ import { usePathname } from 'next/navigation';
 import { useMotionActive } from '@/lib/motion-activation';
 import { ANCHOR_TRAVEL_EVENT, NAV_VISIBILITY_EVENT, type NavVisibility } from '@/lib/scroll-events';
 import NavigationRefraction from './NavigationRefraction';
+import ThemeToggle from './ThemeToggle';
 import styles from './Navigation.module.scss';
 
 const links = [
   ['The Mind', 'mind'], ['Education', 'education'], ['Skills', 'skills'],
-  ['Selected Work', 'work'], ['Play', 'signal-run'], ['Let’s Talk', 'contact'],
+  ['Selected Work', 'work'], ['Let’s Talk', 'contact'],
 ] as const;
 const NavigationMenu = lazy(() => import('./NavigationMenu'));
 const NavigationMotion = dynamic(() => import('./motion/NavigationMotion'), { ssr: false });
@@ -173,14 +174,17 @@ export default function Navigation() {
     <nav ref={nav} aria-label="Main navigation" className={styles.nav} onPointerEnter={enterGlass} onPointerMove={moveGlass} onPointerLeave={leaveGlass} onPointerCancel={leaveGlass}>
       <span className={styles.glassSurface} data-glass-surface aria-hidden="true" />
       <Link href="/" className={styles.identity} aria-label="Piyush Rajput — home">PIYUSH RAJPUT</Link>
-      <div className={styles.desktop}>{links.map(([label, id]) => <a ref={id === 'contact' ? contact : undefined} key={id} href={`/#${id}`} className={id === 'contact' ? styles.contact : styles.navLink} aria-current={path === '/' && active === id ? 'location' : undefined} onClick={() => setActive(id)} onPointerEnter={id === 'contact' ? event => { contactBounds.current = event.currentTarget.getBoundingClientRect(); } : undefined} onPointerMove={id === 'contact' ? event => {
-        const rectangle = contactBounds.current;
-        if (!enabled.current || !rectangle) return;
-        point.current.magnetX = ((event.clientX - rectangle.left) / rectangle.width - .5) * 5;
-        point.current.magnetY = ((event.clientY - rectangle.top) / rectangle.height - .5) * 4;
-        scheduleReflection();
-      } : undefined} onPointerLeave={id === 'contact' ? () => { point.current.magnetX = 0; point.current.magnetY = 0; if (enabled.current) scheduleReflection(); } : undefined}><span className={id === 'contact' ? styles.contactInner : undefined}>{label}{id === 'contact' && <span aria-hidden="true">↗</span>}</span></a>)}</div>
-      <button ref={toggle} className={styles.toggle} type="button" aria-expanded={open} aria-controls="mobile-navigation" onClick={() => { setMenuLoaded(true); setOpen(!open); }}><span>{open ? 'Close' : 'Menu'}</span><span className={styles.menuMark} aria-hidden="true">{open ? '−' : '+'}</span></button>
+      <div className={styles.navActions}>
+        <div className={styles.desktop}>{links.map(([label, id]) => <a ref={id === 'contact' ? contact : undefined} key={id} href={`/#${id}`} className={id === 'contact' ? styles.contact : styles.navLink} aria-current={path === '/' && active === id ? 'location' : undefined} onClick={() => setActive(id)} onPointerEnter={id === 'contact' ? event => { contactBounds.current = event.currentTarget.getBoundingClientRect(); } : undefined} onPointerMove={id === 'contact' ? event => {
+          const rectangle = contactBounds.current;
+          if (!enabled.current || !rectangle) return;
+          point.current.magnetX = ((event.clientX - rectangle.left) / rectangle.width - .5) * 5;
+          point.current.magnetY = ((event.clientY - rectangle.top) / rectangle.height - .5) * 4;
+          scheduleReflection();
+        } : undefined} onPointerLeave={id === 'contact' ? () => { point.current.magnetX = 0; point.current.magnetY = 0; if (enabled.current) scheduleReflection(); } : undefined}><span className={id === 'contact' ? styles.contactInner : undefined}>{label}{id === 'contact' && <span aria-hidden="true">↗</span>}</span></a>)}</div>
+        <ThemeToggle />
+        <button ref={toggle} className={styles.toggle} type="button" aria-expanded={open} aria-controls="mobile-navigation" onClick={() => { setMenuLoaded(true); setOpen(!open); }}><span>{open ? 'Close' : 'Menu'}</span><span className={styles.menuMark} aria-hidden="true">{open ? '−' : '+'}</span></button>
+      </div>
       {menuLoaded && <Suspense fallback={open ? <div id="mobile-navigation" className={styles.mobile}>{menuLinks}</div> : null}><NavigationMenu open={open}>{menuLinks}</NavigationMenu></Suspense>}
     </nav>
     <NavigationRefraction nav={nav} />

@@ -22,7 +22,7 @@ async function auditAccessibility(page, label) {
 async function verifyEvidence(page) {
   const row = id => page.locator(`[data-evidence-item="${id}"]`);
   const preview = id => page.locator(`[data-certificate-preview="${id}"]`);
-  await expect(page.locator('#evidence article')).toHaveCount(4);
+  await expect(page.locator('#evidence [data-evidence-item]')).toHaveCount(4);
   for (const id of ['olympai', 'sih']) await expect(row(id).locator('[data-certificate-action]')).toHaveCount(0);
   await expect(row('laserhacks').locator('strong')).toHaveText('Finalist — Top 7 Teams');
   await expect(row('laserhacks')).toContainText('Although we did not win, our team successfully competed in the final round.');
@@ -66,6 +66,23 @@ async function verifyEvidence(page) {
   await expect(dialog).toBeHidden();
   await expect(trigger).toBeFocused();
   check('Evidence provides keyboard preview, dismissal, accessible modal, and focus return');
+
+  const course = page.locator('[data-course-credential="leadership-feedback"]');
+  await expect(course).toContainText('LinkedIn Learning');
+  await expect(course.locator('time')).toHaveAttribute('datetime', '2026-11-07T21:16:00Z');
+  const courseTrigger = course.getByRole('link',{name:'View Leadership through Feedback certificate'});
+  await courseTrigger.focus();
+  await expect(preview('leadership-feedback')).toBeVisible();
+  await courseTrigger.press('Enter');
+  const courseDialog = page.getByRole('dialog',{name:'Leadership through Feedback certificate'});
+  await expect(courseDialog).toBeVisible();
+  const courseImage = courseDialog.locator('img');
+  await expect(courseImage).toHaveAttribute('src','/certificates/leadership-feedback.webp');
+  await expect.poll(() => courseImage.evaluate(image => image.naturalWidth)).toBe(1440);
+  await page.keyboard.press('Escape');
+  await expect(courseDialog).toBeHidden();
+  await expect(courseTrigger).toBeFocused();
+  check('The verified LinkedIn Learning course has a separate, accessible certificate');
 }
 
 async function verifyTouchEvidence(page) {
@@ -111,23 +128,26 @@ try {
   await expect.poll(() => page.locator('#human [data-hero-portrait] img').evaluate(image => {
     const box = image.getBoundingClientRect();
     const header = document.querySelector('body > header').getBoundingClientRect();
-    return box.top > header.bottom && box.bottom <= innerHeight;
+    const hero = image.closest("#human").getBoundingClientRect();
+    return box.top > header.bottom && box.height >= 640 && box.bottom <= hero.bottom;
   })).toBe(true);
   await page.screenshot({path:'test-results/laptop-hero.png'});
   await page.setViewportSize({width:1440,height:1000});
-  check('The original portrait fits beneath the navigation at 1366 × 768');
+  check('The restored large portrait clears the navigation and fits within the laptop hero');
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);check('Desktop has no horizontal overflow');
 
   const nav=page.getByRole('navigation',{name:'Main navigation'});
   assert.equal((await nav.getByRole('link',{name:'Piyush Rajput — home'}).innerText()).trim(),'PIYUSH RAJPUT');
   assert.equal(await nav.locator('svg').count(),0);
-  for(const id of ['mind','education','skills','work','signal-run','contact']) assert.equal(await nav.locator(`a[href="/#${id}"]`).filter({visible:true}).count(),1);
+  for(const id of ['mind','education','skills','work','contact']) assert.equal(await nav.locator(`a[href="/#${id}"]`).filter({visible:true}).count(),1);
   const glass=await nav.locator('[data-glass-surface]').evaluate(element=>{
     const style=getComputedStyle(element);
     return {radius:parseFloat(style.borderRadius),color:style.backgroundColor,backdrop:style.backdropFilter};
   });
   assert.ok(glass.radius>=16,'The navigation must retain its rounded glass geometry');
-  report.observations.navigation=glass;check('Floating navigation has name-only branding and six working chapter links');
+  assert.equal(await nav.locator('a[href="/#signal-run"]').count(),0);
+  assert.equal(await page.locator('#signal-run').count(),0);
+  report.observations.navigation=glass;check('Floating navigation keeps five chapter links and the home page leaves the arcade undisclosed');
 
   const education=await page.locator('#education').textContent();
   assert.match(education,/Karnavati University/);assert.match(education,/Artificial Intelligence and Machine Learning/);assert.match(education,/First year/);assert.match(education,/Science stream/);
@@ -181,6 +201,8 @@ try {
   await page.locator('#education').screenshot({path:'test-results/education.png'});await page.locator('#skills').screenshot({path:'test-results/skills.png'});await page.locator('#work').screenshot({path:'test-results/work.png'});
   await verifyEvidence(page);
 
+  await page.goto(base+'/play/',{waitUntil:'networkidle'});
+  await page.getByRole('link',{name:'Back to Portfolio',exact:true}).waitFor();
   await page.locator('#signal-run').scrollIntoViewIfNeeded();await page.getByRole('combobox',{name:'PLAY STYLE'}).waitFor();
   await page.getByRole('combobox',{name:'PLAY STYLE'}).selectOption('turns');await page.getByRole('button',{name:'PRESS START →',exact:true}).click();
   for(let i=0;i<3;i++){await page.getByRole('button',{name:'JUMP FORWARD ↑',exact:true}).click();await page.getByRole('button',{name:'MOVE FORWARD →',exact:true}).click();}
@@ -196,7 +218,7 @@ try {
     const response=await page.goto(`${base}/projects/${slug}/`,{waitUntil:'networkidle'});assert.equal(response.status(),200);assert.equal(await page.locator('h1').count(),1);
     (await page.locator('script[type="application/ld+json"]').allTextContents()).forEach(x=>JSON.parse(x));
   }check('All six crawlable case-study pages and JSON-LD parse');await page.screenshot({path:'test-results/project.png'});
-  for(const endpoint of ['/projects/','/sitemap.xml','/robots.txt','/llms.txt','/llms-full.txt','/about.md','/projects.md','/skills.md','/education.md','/og.png','/images/hero-transparent-1080.avif','/images/closing-portrait-256.avif']) assert.equal((await page.request.get(base+endpoint)).status(),200,endpoint);
+  for(const endpoint of ['/projects/','/play/','/sitemap.xml','/robots.txt','/llms.txt','/llms-full.txt','/about.md','/projects.md','/skills.md','/education.md','/og.png','/images/hero-transparent-1080.avif','/images/closing-portrait-256.avif']) assert.equal((await page.request.get(base+endpoint)).status(),200,endpoint);
   for(const endpoint of ['/education.md','/skills.md','/llms-full.txt']) {
     const text=await(await page.request.get(base+endpoint)).text();assert.match(text,/Karnavati|GSAP|Python/);assert.doesNotMatch(text,/Airport|\bIBM\b|\b(?:66|72)\s*%|\bNode\.js\b|\bExpress(?:\.js)?\b/);
   }check('SEO and AI resources return HTTP 200 and contain consistent verified education and skills');
@@ -216,10 +238,12 @@ try {
   await mobile.waitForURL('**/#skills');
   await mobile.getByRole('button',{name:'Menu',exact:true}).waitFor();
   const skillsTop = await mobile.locator('#skills').evaluate(section => section.getBoundingClientRect().top);
-  assert.ok(Math.abs(skillsTop - 120) < 6, `Skills must land under the mobile navbar before the game loads, got ${skillsTop}`);
-  check('Mobile glass navigation supports Escape and lands at Skills before game initialization');
-  await mobile.locator('#signal-run').scrollIntoViewIfNeeded();await mobile.getByRole('button',{name:'PRESS START →',exact:true}).waitFor();await mobile.screenshot({path:'test-results/mobile-game.png'});await auditAccessibility(mobile,'mobile');
+  assert.ok(Math.abs(skillsTop - 120) < 6, `Skills must land under the mobile navbar with the separate game route, got ${skillsTop}`);
+  check('Mobile glass navigation supports Escape and lands at Skills on the portfolio');
   await verifyTouchEvidence(mobile);
+  await auditAccessibility(mobile,'mobile-home');
+  await mobile.goto(base+'/play/',{waitUntil:'networkidle'});
+  await mobile.locator('#signal-run').scrollIntoViewIfNeeded();await mobile.getByRole('button',{name:'PRESS START →',exact:true}).waitFor();await mobile.screenshot({path:'test-results/mobile-game.png'});await auditAccessibility(mobile,'mobile-play');
   await mobile.emulateMedia({reducedMotion:'reduce'});await mobile.goto(base,{waitUntil:'networkidle'});
   await mobile.getByRole('button',{name:'Explore portrait as code',exact:true}).tap();await portraitState(mobile,'code');
   const staticPortrait=await mobile.locator('[data-portrait-canvas]').evaluate(canvas=>canvas.toDataURL());

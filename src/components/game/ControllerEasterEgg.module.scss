@@ -1,0 +1,123 @@
+.trigger {
+  position: fixed;
+  z-index: 45;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 25%;
+  background: none;
+  touch-action: manipulation;
+
+  img {
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 4px 5px #0003);
+    transition: transform .22s ease;
+  }
+
+  &:hover img, &:focus-visible img { transform: scale(1.07); }
+}
+
+.invite {
+  width: min(33rem, calc(100% - 2rem));
+  max-width: none;
+  max-height: calc(100dvh - 2rem);
+  padding: 0;
+  border: 1px solid var(--line, #24242450);
+  border-radius: 1.2rem;
+  background: var(--paper, #f3f0e8);
+  color: var(--ink, #0b0c0f);
+  box-shadow: 0 25px 90px #0005, inset 0 1px 0 #fff3;
+  overscroll-behavior: contain;
+
+  &::backdrop {
+    background: #090c14a0;
+    backdrop-filter: blur(5px);
+  }
+}
+
+.panel {
+  position: relative;
+  display: grid;
+  gap: 1.15rem;
+  padding: clamp(1.3rem, 5vw, 2.5rem);
+  padding-top: clamp(2.7rem, 7vw, 3.8rem);
+
+  h2 {
+    position: relative;
+    max-width: 8.5em;
+    font-size: clamp(2.65rem, 7vw, 4.4rem);
+    line-height: .98;
+    letter-spacing: -.065em;
+  }
+
+  p {
+    max-width: 19rem;
+    color: var(--graphite, #33343a);
+    line-height: 1.6;
+  }
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  font: 500 .64rem/1.4 var(--font-mono), monospace;
+  letter-spacing: .1em;
+  color: var(--red-text, #bf2434);
+
+  i { width: 7px; height: 7px; background: var(--red, #ed3345); }
+}
+
+.sticker {
+  position: absolute;
+  inset-block-start: .35rem;
+  inset-inline-end: .85rem;
+  width: clamp(4rem, 14vw, 6.6rem);
+  height: auto;
+  rotate: 10deg;
+  pointer-events: none;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .6rem;
+  margin-top: .35rem;
+}
+
+.play, .cancel {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: .65rem;
+  padding: .65rem .95rem;
+  font: 500 .64rem/1.4 var(--font-mono), monospace;
+  letter-spacing: .04em;
+  border: 1px solid var(--line, #24242450);
+}
+
+.play {
+  background: var(--ink, #0b0c0f);
+  color: var(--paper, #f3f0e8);
+  &:hover { background: var(--red-text, #bf2434); }
+}
+
+.cancel {
+  background: transparent;
+  color: var(--ink, #0b0c0f);
+  &:hover { background: color-mix(in srgb, currentColor 8%, transparent); }
+}
+
+:global(html[data-theme='cyber']) .invite {
+  background: var(--panel, #10182b);
+  box-shadow: 0 0 30px #2f70ff2a, 0 25px 90px #0008, inset 0 1px 0 #8db9ff3b;
+}
+
+:global(html[data-theme='cyber']) .play:hover { color: #070b16; }
+
+@media (prefers-reduced-motion: reduce) {
+  .trigger:hover img, .trigger:focus-visible img { transform: none; }
+}
