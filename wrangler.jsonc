@@ -1,0 +1,32 @@
+{
+	"$schema": "./node_modules/wrangler/config-schema.json",
+	"name": "piyush-portfolio",
+	"main": "dist/server/index.js",
+	"compatibility_date": "2026-11-04",
+	"workers_dev": false,
+	"preview_urls": false,
+	"assets": {
+		"directory": "./dist/client",
+		"binding": "ASSETS",
+		"html_handling": "force-trailing-slash",
+		"not_found_handling": "404-page",
+		"run_worker_first": [
+			"/api/leaderboard*"
+		]
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "signal-run-leaderboard",
+			// Replace this local-only ID when you connect your Cloudflare database.
+			"database_id": "a9a474c2-4280-4c87-b0f7-dc56698b2e64",
+			"migrations_dir": "drizzle"
+		},
+		{
+			"binding": "signal_run_leaderboard",
+			"database_name": "signal-run-leaderboard",
+			"database_id": "a9a474c2-4280-4c87-b0f7-dc56698b2e64",
+			"remote": true
+		}
+	]
+}

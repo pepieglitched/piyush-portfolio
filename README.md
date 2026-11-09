@@ -34,6 +34,10 @@ npm run preview
 
 Portraits use `next/image` with a custom loader selecting pre-optimized 640, 828, 1080, and 1600-pixel variants (AVIF with alpha for the hero). This supports static hosting without a runtime image server. If portrait sources change, inspect `scripts/optimize-assets.mjs` and regenerate all expected variants before building. For the hero cutout and its responsive variants alone, run `npm run assets -- --portrait-only`. The saved alpha mask is combined with the unaltered source RGB channels. Run `npm run assets -- --closing-only` for the closing portrait’s three AVIF sizes.
 
+## Deploy to Cloudflare Workers
+
+Follow [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) to set up the Worker, D1, and GitHub builds. Use [HOW_TO_UPDATE.md](HOW_TO_UPDATE.md) for local edits, previews, deployment, and rollback.
+
 ## Deploy to Vercel
 
 1. Put this project in a Git repository and import it into Vercel. If it is inside a larger repository, set the Vercel Root Directory to this folder.

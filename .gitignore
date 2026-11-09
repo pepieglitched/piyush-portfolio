@@ -3,6 +3,10 @@ node_modules/
 out/
 dist/
 .sites-runtime/
+.wrangler/
+.dev.vars*
+!.dev.vars.example
+backups/
 *.tsbuildinfo
 .env*
 !.env.example

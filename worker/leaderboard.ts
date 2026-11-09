@@ -10,6 +10,7 @@ export interface LeaderboardEnv {
   DB?: { prepare(sql: string): Statement };
   LEADERBOARD_SIGNING_KEY?: string;
   LEADERBOARD_ORIGIN?: string;
+  LEADERBOARD_TRUST_SITES_IDENTITY?: string;
 }
 
 type Run = { version: number; seed: number; nonce: string; issuedAt: number; actor: string };
@@ -46,8 +47,9 @@ async function sign(key: CryptoKey, message: string) {
   return base64url(new Uint8Array(await crypto.subtle.sign('HMAC', key, encoder.encode(message))));
 }
 
-async function actorHash(request: Request, key: CryptoKey) {
-  const userId = request.headers.get('oai-authenticated-user-id');
+async function actorHash(request: Request, key: CryptoKey, trustSitesIdentity: boolean) {
+  // Public Workers must ignore identity headers that any caller can supply.
+  const userId = trustSitesIdentity ? request.headers.get('oai-authenticated-user-id') : null;
   const ip = request.headers.get('cf-connecting-ip');
   const identity = userId ? `user:${userId}` : ip ? `ip:${ip}` : 'anonymous';
   // Rate-limit identifiers and signatures are scoped to this deployment.
@@ -167,7 +169,7 @@ export async function handleLeaderboard(request: Request, env: LeaderboardEnv) {
     if (reading) return reply({ entries: await getEntries(db) });
     const now = Date.now();
     const key = await crypto.subtle.importKey('raw', encoder.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign', 'verify']);
-    const actor = await actorHash(request, key);
+    const actor = await actorHash(request, key, env.LEADERBOARD_TRUST_SITES_IDENTITY === 'true');
     if (!await reserveRequest(db, actor, start ? 'start' : 'post', now)) {
       return failure(429, 'Too many requests. Try again in a moment.', {
         'Retry-After': String(Math.ceil((60_000 - now % 60_000) / 1_000)),

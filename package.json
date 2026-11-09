@@ -12,7 +12,9 @@
     "typecheck": "tsc --noEmit",
     "assets": "node scripts/optimize-assets.mjs",
     "preview": "serve out -l 3000",
-    "preview:leaderboard": "node scripts/preview-leaderboard.mjs"
+    "preview:leaderboard": "node scripts/preview-leaderboard.mjs",
+    "cf:dev": "wrangler dev",
+    "cf:deploy": "wrangler deploy"
   },
   "dependencies": {
     "next": "^16.0.0",
@@ -41,7 +43,8 @@
     "@playwright/test": "^1.56.0",
     "lighthouse": "^13.0.0",
     "esbuild": "^0.28.2",
-    "serve-handler": "6.1.7"
+    "serve-handler": "6.1.7",
+    "wrangler": "4.158.0"
   },
   "overrides": { "compression": "^1.8.2", "@typescript-eslint/typescript-estree": { "minimatch": "^11.0.5" } }
 }

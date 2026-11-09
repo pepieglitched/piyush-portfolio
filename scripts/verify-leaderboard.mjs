@@ -23,7 +23,7 @@ function request(path, { method = 'GET', actor = 'tester', body, requestOrigin =
   return new Request(origin + '/api/leaderboard' + path, {
     method,
     headers: {
-      'oai-authenticated-user-id': actor,
+      'cf-connecting-ip': actor,
       ...(method === 'POST' ? { origin: requestOrigin } : {}),
       ...(body ? { 'content-type': 'application/json' } : {}),
       ...headers,
@@ -140,7 +140,10 @@ test('Write requests enforce same-origin, body limits, and concurrent request li
   assert.equal((await call('/start')).status, 405);
   assert.equal((await call('', { method: 'POST', body: 'x'.repeat(25_000) })).status, 413);
   assert.equal((await call('', { method: 'POST', headers: { 'content-type': 'text/plain' } })).status, 415);
-  const responses = await Promise.all(Array.from({ length: 25 }, () => call('/start', { method: 'POST' })));
+  const responses = await Promise.all(Array.from({ length: 25 }, (_, index) => call('/start', {
+    method: 'POST',
+    headers: { 'oai-authenticated-user-id': `spoofed-${index}` },
+  })));
   assert.equal(responses.filter(({ status }) => status === 200).length, 24);
   const limited = responses.find(({ status }) => status === 429);
   assert.ok(Number(limited?.headers.get('retry-after')) > 0);
